@@ -1,0 +1,100 @@
+---
+title: "Add Swap and Tune Performance on Your Opus Host VPS"
+sidebarTitle: "Swap & Performance"
+description: "Add a swap file to survive memory spikes, tune swappiness, and use built-in tools to diagnose slow performance on your Opus Host VPS."
+---
+
+A free VPS gives you a modest amount of RAM, and it does not take much to hit the ceiling. When memory runs out, the Linux kernel starts killing processes, usually the one you cared about most. A swap file gives the kernel breathing room by letting it move inactive memory to disk.
+
+<Warning>
+  Swap uses disk space and is much slower than RAM. Use it as a safety net for occasional spikes, not as a substitute for enough memory. Check your [resource limits](/vps/resource-limits) before adding a large swap file.
+</Warning>
+
+## Add a swap file
+
+<Steps>
+  <Step title="Check current swap">
+    ```bash
+    free -h
+    swapon --show
+    ```
+  </Step>
+  <Step title="Create a 1 GB swap file">
+    ```bash
+    sudo fallocate -l 1G /swapfile
+    sudo chmod 600 /swapfile
+    sudo mkswap /swapfile
+    sudo swapon /swapfile
+    ```
+  </Step>
+  <Step title="Make it persistent across reboots">
+    ```bash
+    echo '/swapfile none swap sw 0 0' | sudo tee -a /etc/fstab
+    ```
+  </Step>
+  <Step title="Verify">
+    ```bash
+    free -h
+    ```
+  </Step>
+</Steps>
+
+## Tune swappiness
+
+Swappiness controls how eagerly the kernel moves memory to swap. On a server, a lower value keeps active data in RAM longer.
+
+```bash
+# Check current value (default is usually 60)
+cat /proc/sys/vm/swappiness
+
+# Set to 10 for this session
+sudo sysctl vm.swappiness=10
+
+# Make it permanent
+echo 'vm.swappiness=10' | sudo tee -a /etc/sysctl.conf
+```
+
+## Diagnose slow performance
+
+### Check memory and CPU
+
+```bash
+free -h        # memory usage
+uptime         # load average
+top            # live process view (press q to quit)
+htop           # nicer top; install with: sudo apt install htop
+```
+
+### Find the biggest memory hogs
+
+```bash
+ps aux --sort=-%mem | head -n 10
+```
+
+### Find the biggest CPU hogs
+
+```bash
+ps aux --sort=-%cpu | head -n 10
+```
+
+### Check disk usage
+
+```bash
+df -h          # disk space by mount
+du -sh /*      # size of each top-level directory
+```
+
+### Check disk I/O
+
+```bash
+sudo apt install sysstat -y
+iostat -x 2 5
+```
+
+## Remove a swap file
+
+```bash
+sudo swapoff /swapfile
+sudo sed -i '/\/swapfile/d' /etc/fstab
+sudo rm /swapfile
+```

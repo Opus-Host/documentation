@@ -1,0 +1,78 @@
+---
+title: "Report Abuse From an Opus Host VPS or User"
+sidebarTitle: "Report Abuse"
+description: "Report spam, scanning, DDoS, malware, or other abuse originating from an Opus Host VPS. What to send to abuse@opus-host.de and what happens next."
+---
+
+If you are seeing abuse coming from an Opus Host IP address (spam, port scanning, brute-force attempts, DDoS, malware, phishing, or anything else that violates our [Acceptable Use Policy](/account/rules)), we want to know. Reports are handled by our abuse team and result in action against the offending account.
+
+## How to report
+
+Send an email to [**abuse@opus-host.de**](mailto:abuse@opus-host.de) with the details below.
+
+<Card title="Report abuse" icon="envelope" href="mailto:abuse@opus-host.de">
+  Email [abuse@opus-host.de](mailto:abuse@opus-host.de) with logs, timestamps (in UTC), and the offending IP address.
+</Card>
+
+## What to include in your report
+
+The more evidence you can send, the faster we can act. A useful report includes:
+
+- The **IP address** the abuse is coming from.
+- **Timestamps in UTC**, including the time zone if you cannot convert.
+- The **type of abuse** (spam, scanning, DDoS, malware, phishing, etc.).
+- **Raw log excerpts** showing the activity, as plain text (not screenshots of text).
+- **Email headers** if you are reporting spam. Full headers, not just the body.
+- Any **URLs** involved (for phishing or malware reports).
+- Your **contact email** so we can follow up if we need clarification.
+
+### Example: reporting SSH brute-force
+
+```text
+From: you@example.com
+To: abuse@opus-host.de
+Subject: SSH brute-force from <opus-host-ip>
+
+Hello Opus Host abuse team,
+
+We are seeing repeated SSH brute-force attempts from one of your IPs.
+
+Offending IP: 203.0.113.42
+Target IP:    198.51.100.10
+Time window:  2026-08-07 09:12 to 09:47 UTC
+
+Sample log entries (from /var/log/auth.log):
+
+2026-08-07T09:12:03Z sshd[1234]: Failed password for root from 203.0.113.42 port 51022
+2026-08-07T09:12:05Z sshd[1234]: Failed password for root from 203.0.113.42 port 51023
+... (dozens more)
+
+Contact: you@example.com
+```
+
+## What happens after you report
+
+<Steps>
+  <Step title="We acknowledge the report">
+    You will normally get an automated acknowledgement, and a human response within our standard support window.
+  </Step>
+  <Step title="We investigate">
+    We correlate your report with our own logs and monitoring to confirm the activity and identify the account behind the IP.
+  </Step>
+  <Step title="We take action">
+    Depending on severity, actions range from a warning to the customer, to temporary suspension of the VPS, to permanent account termination. Severe cases (child sexual abuse material, active DDoS, or law enforcement matters) are actioned immediately.
+  </Step>
+  <Step title="We follow up">
+    Where appropriate, we will let you know what action was taken. We may not be able to share full details for privacy and legal reasons.
+  </Step>
+</Steps>
+
+<Warning>
+  Do not attempt to "hack back" or scan the offending VPS. Return-fire activity is also a violation of our AUP and could get **your** account (or your provider's account, if that is where you are scanning from) suspended.
+</Warning>
+
+## Not the right channel
+
+- **Your own VPS is compromised.** Open a ticket from the [control panel](https://opus-host.de/login) or ask on [Discord](https://discord.gg/opushost) so we can help you recover.
+- **A billing or account issue.** Use [Contact Support](/support/contact) instead.
+- **A copyright or DMCA notice.** Send it to `abuse@opus-host.de` and clearly mark the subject line as `DMCA` or `Copyright`.

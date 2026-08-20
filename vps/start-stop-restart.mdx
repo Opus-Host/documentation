@@ -1,0 +1,64 @@
+---
+title: "Start, Stop, and Restart Your Opus Host VPS Instance"
+sidebarTitle: "Power Controls"
+description: "Learn how to safely start, stop, and restart your Opus Host VPS from the control panel or command line, and when to use each action."
+---
+
+You can control the power state of your VPS directly from the Opus Host control panel or from the command line over SSH. Understanding the difference between **Stop**, **Restart**, and **Force Stop** is important — choosing the wrong action at the wrong time can interrupt running services or, in the worst case, leave your filesystem in an inconsistent state.
+
+## From the control panel
+
+<Steps>
+  <Step title="Log in and select your VPS">
+    Log in to the [Opus Host control panel](https://opus-host.de/login) and click on the VPS you want to manage from your dashboard.
+  </Step>
+  <Step title="Locate the power buttons">
+    Find the power control buttons in the top-right corner of your VPS dashboard. You will see **Start**, **Stop**, **Restart**, and **Force Stop** options.
+  </Step>
+  <Step title="Click the desired action">
+    Click **Start**, **Stop**, or **Restart** depending on what you need. A confirmation prompt may appear for destructive actions — read it carefully before confirming.
+  </Step>
+  <Step title="Wait for the status indicator to update">
+    Watch the status indicator next to your VPS name. It will cycle through intermediate states (e.g., _Stopping…_ or _Rebooting…_) before settling on the new state such as **Running** or **Stopped**.
+  </Step>
+</Steps>
+
+## From SSH
+
+If you are already connected to your VPS over SSH, you can trigger a graceful reboot or shutdown directly from the command line without visiting the control panel.
+
+```bash
+# Graceful reboot
+sudo reboot
+
+# Graceful shutdown
+sudo shutdown -h now
+
+# Shutdown in 5 minutes
+sudo shutdown -h +5
+```
+
+Using these commands gives the operating system time to stop services, flush disk buffers, and cleanly unmount filesystems before powering off — which is always preferable to a forced stop.
+
+## When to use each action
+
+| Action | When to use |
+| --- | --- |
+| Start | Your VPS is stopped and you need to turn it on |
+| Stop | Gracefully shut down all services and power off the server |
+| Restart | Apply updates, after configuration changes, or when services are unresponsive |
+| Force Stop | Your VPS is completely frozen and won't respond to a graceful stop |
+
+<Warning>
+  **Force Stop cuts power immediately** without flushing disk buffers or stopping running processes. Only use it if your server is completely unresponsive and a graceful stop has failed — it can cause filesystem corruption and data loss.
+</Warning>
+
+<Tip>
+  Before stopping your VPS for maintenance, manually stop your key services first to allow for a graceful shutdown. For example:
+
+  ```bash
+  systemctl stop nginx
+  ```
+
+  This ensures active connections are drained and no data is lost mid-write.
+</Tip>

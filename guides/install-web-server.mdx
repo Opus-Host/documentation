@@ -1,0 +1,142 @@
+---
+title: "Install Nginx and Serve a Website on Your Free VPS"
+sidebarTitle: "Web Server"
+description: "Install Nginx on your Opus Host VPS, deploy a static or PHP website, and configure a domain name to make your site publicly accessible."
+---
+
+This guide walks you through installing Nginx on your Opus Host VPS, serving a website, and optionally pointing a domain name to it. By the end you'll have a live site accessible over HTTP — and optionally secured with a free TLS certificate from Let's Encrypt.
+
+<Note>
+  You need a running VPS with SSH access. If you haven't claimed yours yet, see [Claim Your VPS](/claim-your-vps).
+</Note>
+
+## Install Nginx
+
+<Steps>
+  <Step title="Connect to your VPS via SSH">
+    Open a terminal and SSH into your server:
+
+    ```bash
+    ssh root@YOUR_SERVER_IP
+    ```
+  </Step>
+  <Step title="Update packages">
+    Make sure your package lists are current and all installed packages are up to date:
+
+    ```bash
+    apt update && apt upgrade -y
+    ```
+  </Step>
+  <Step title="Install Nginx">
+    Install Nginx from the default APT repository:
+
+    ```bash
+    apt install nginx -y
+    ```
+  </Step>
+  <Step title="Start and enable Nginx">
+    Start the service immediately and configure it to launch automatically on every reboot:
+
+    ```bash
+    systemctl start nginx
+    systemctl enable nginx
+    ```
+  </Step>
+  <Step title="Open port 80 in the FreeHost panel">
+    Navigate to [Networking](/panel/networking) in the FreeHost panel and add an inbound rule to allow TCP traffic on port **80**. Without this step your server won't be reachable from the internet.
+  </Step>
+  <Step title="Verify the default page">
+    Open `http://YOUR_SERVER_IP` in a browser. You should see the **Welcome to nginx!** page, which confirms Nginx is running and publicly accessible.
+  </Step>
+</Steps>
+
+## Deploy Your Website
+
+<Steps>
+  <Step title="Create a directory for your site">
+    Create a dedicated folder to hold your website files:
+
+    ```bash
+    mkdir -p /var/www/mysite
+    ```
+  </Step>
+  <Step title="Upload your files">
+    You can upload files using the [File Manager](/panel/file-manager) in the Opus Host panel, or transfer them from your local machine with SCP:
+
+    ```bash
+    scp -r ./mysite root@YOUR_SERVER_IP:/var/www/mysite
+    ```
+  </Step>
+  <Step title="Create an Nginx server block">
+    Create a new configuration file for your site:
+
+    Create the file `/etc/nginx/sites-available/mysite` with the following content:
+
+    ```nginx
+    server {
+        listen 80;
+        server_name YOUR_DOMAIN_OR_IP;
+        root /var/www/mysite;
+        index index.html index.php;
+    }
+    ```
+  </Step>
+  <Step title="Enable the site and reload Nginx">
+    Symlink the config into `sites-enabled`, test for syntax errors, then reload Nginx to apply the changes:
+
+    ```bash
+    ln -s /etc/nginx/sites-available/mysite /etc/nginx/sites-enabled/
+    nginx -t && systemctl reload nginx
+    ```
+  </Step>
+</Steps>
+
+## Add HTTPS with Let's Encrypt
+
+<Steps>
+  <Step title="Point your domain to your VPS">
+    Before requesting a certificate, make sure your domain's DNS A record points to your VPS IP address. See [Custom Domain](/guides/custom-domain) for a step-by-step walkthrough.
+  </Step>
+  <Step title="Install Certbot">
+    Install Certbot and its Nginx plugin:
+
+    ```bash
+    apt install certbot python3-certbot-nginx -y
+    ```
+  </Step>
+  <Step title="Obtain a certificate">
+    Run Certbot with the `--nginx` flag so it automatically edits your server block to enable HTTPS:
+
+    ```bash
+    certbot --nginx -d yourdomain.com
+    ```
+
+    Follow the interactive prompts to enter your email address and agree to the terms of service.
+  </Step>
+  <Step title="Test automatic renewal">
+    Certbot installs a systemd timer that renews certificates before they expire. Test the renewal process with a dry run:
+
+    ```bash
+    certbot renew --dry-run
+    ```
+
+    If the command completes without errors, auto-renewal is working correctly.
+  </Step>
+</Steps>
+
+<Tip>
+  For PHP sites, install PHP-FPM alongside Nginx:
+
+  ```bash
+  apt install php-fpm php-mysql -y
+  ```
+
+  Then update your Nginx server block to pass `.php` requests to the FPM socket:
+
+  ```nginx
+  location ~ \.php$ {
+      include snippets/fastcgi-php.conf;
+      fastcgi_pass unix:/run/php/php-fpm.sock;
+  }
+  ```
+</Tip>

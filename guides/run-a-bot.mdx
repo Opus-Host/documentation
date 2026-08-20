@@ -1,0 +1,165 @@
+---
+title: "Run a Discord Bot Around the Clock on Your Free VPS"
+sidebarTitle: "Discord Bot"
+description: "Deploy and keep a Discord bot running continuously on your Opus Host VPS using Node.js or Python — no need to leave your PC on all day."
+---
+
+Running a Discord bot on your Opus Host VPS means it stays online 24/7 even when your computer is off. This guide covers deploying a Node.js or Python bot and keeping it alive using PM2 or systemd, so your bot automatically restarts after crashes or reboots.
+
+## Choose Your Language
+
+<Tabs>
+  <Tab title="Node.js">
+    <Steps>
+      <Step title="Install Node.js">
+        Add the NodeSource repository and install Node.js 20:
+
+        ```bash
+        curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
+        apt install nodejs -y
+        node --version
+        ```
+      </Step>
+      <Step title="Upload or clone your bot files">
+        You can upload files using the [File Manager](/panel/file-manager) in the Opus Host panel, transfer them with SCP, or clone directly from GitHub:
+
+        ```bash
+        apt install git -y
+        git clone https://github.com/yourusername/your-bot.git ~/mybot
+        cd ~/mybot
+        ```
+      </Step>
+      <Step title="Install dependencies">
+        ```bash
+        npm install
+        ```
+      </Step>
+      <Step title="Test the bot">
+        Run the bot once to make sure it connects and responds correctly before setting it up as a background service:
+
+        ```bash
+        node index.js
+        ```
+
+        Press **Ctrl \+ C** to stop it when you're ready to move on.
+      </Step>
+    </Steps>
+  </Tab>
+  <Tab title="Python">
+    <Steps>
+      <Step title="Install Python and pip">
+        ```bash
+        apt install python3 python3-pip -y
+        python3 --version
+        ```
+      </Step>
+      <Step title="Upload or clone your bot files">
+        Transfer your files via the [File Manager](/panel/file-manager), SCP, or clone from GitHub:
+
+        ```bash
+        git clone https://github.com/yourusername/your-bot.git ~/mybot
+        cd ~/mybot
+        ```
+      </Step>
+      <Step title="Install dependencies">
+        ```bash
+        pip3 install -r requirements.txt
+        ```
+      </Step>
+      <Step title="Test the bot">
+        Run the bot to confirm it starts without errors:
+
+        ```bash
+        python3 bot.py
+        ```
+
+        Press **Ctrl \+ C** to stop it when you're satisfied.
+      </Step>
+    </Steps>
+  </Tab>
+</Tabs>
+
+## Keep Your Bot Running with PM2 (Node.js)
+
+PM2 is a process manager for Node.js applications. It restarts your bot automatically if it crashes and can start it on system boot.
+
+<Steps>
+  <Step title="Install PM2 globally">
+    ```bash
+    npm install -g pm2
+    ```
+  </Step>
+  <Step title="Start your bot with PM2">
+    ```bash
+    pm2 start index.js --name my-bot
+    ```
+  </Step>
+  <Step title="Enable auto-start on reboot">
+    Generate and apply the startup hook so PM2 and your bot survive a server restart:
+
+    ```bash
+    pm2 startup
+    pm2 save
+    ```
+
+    Run the command that `pm2 startup` prints (it will look like `sudo env PATH=... pm2 startup systemd -u root --hp /root`).
+  </Step>
+  <Step title="Monitor your bot">
+    Check the current status of all PM2 processes:
+
+    ```bash
+    pm2 status
+    ```
+
+    Tail the live logs for your bot:
+
+    ```bash
+    pm2 logs my-bot
+    ```
+  </Step>
+</Steps>
+
+## Keep Your Bot Running with systemd (Python or Node.js)
+
+systemd is built into every modern Linux system and is a great choice if you prefer not to install PM2, or if your bot is written in Python.
+
+Create a service unit file at `/etc/systemd/system/mybot.service`:
+
+```ini
+[Unit]
+Description=My Discord Bot
+After=network.target
+
+[Service]
+User=root
+WorkingDirectory=/root/mybot
+ExecStart=/usr/bin/python3 bot.py
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+```
+
+For a Node.js bot, change `ExecStart` to `/usr/bin/node /root/mybot/index.js`.
+
+Then enable and start the service:
+
+```bash
+systemctl daemon-reload
+systemctl enable mybot
+systemctl start mybot
+```
+
+Check that the service is running:
+
+```bash
+systemctl status mybot
+```
+
+<Tip>
+  Store your bot token in a `.env` file rather than hard-coding it in your source code. Use the `dotenv` npm package for Node.js or `python-dotenv` for Python to load the file automatically at startup.
+</Tip>
+
+<Warning>
+  Never share or commit your bot token to a public repository. If your token is ever exposed, regenerate it immediately in the [Discord Developer Portal](https://discord.com/developers/applications) to prevent unauthorized access to your bot.
+</Warning>

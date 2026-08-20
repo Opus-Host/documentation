@@ -1,0 +1,84 @@
+---
+title: "Opus Host Quickstart: SSH Into Your VPS in 5 Minutes"
+sidebarTitle: "Quick Start"
+description: "Go from a new Opus Host account to a live VPS with SSH access in under five minutes. Claim your server, grab your credentials, and run your first commands."
+---
+
+This page gets you from zero to a working VPS with SSH access as fast as possible. By the end you'll have a server provisioned and be logged in as root, ready to install whatever you need.
+
+## Prerequisites
+
+Before you begin, make sure you have:
+
+- A Opus Host account — [Register here](/account/register) if you don't have one yet
+- An SSH client: Terminal on Mac or Linux, or Windows Terminal / [PuTTY](https://putty.org) on Windows
+
+<Steps>
+  <Step title="Register and claim your VPS">
+    If you haven't already, create a free account and claim your VPS. See the full walkthrough at [Claim Your VPS](/claim-your-vps).
+  </Step>
+  <Step title="Find your credentials">
+    In the Opus Host dashboard, click on your VPS name. You'll see your:
+
+    - **IP address** — the public address of your server
+    - **Username** — usually `root`
+    - **Password** — auto-generated at provisioning time
+
+    <Warning>
+      Save these credentials somewhere safe. You'll need the IP and password to SSH in.
+    </Warning>
+  </Step>
+  <Step title="Connect via SSH">
+    Open a terminal on your computer and run:
+
+    ```bash
+    ssh root@YOUR_SERVER_IP
+    ```
+
+    Type `yes` when asked to accept the server fingerprint, then enter your password when prompted.
+  </Step>
+  <Step title="Update your server">
+    The first thing to do on any fresh Linux server is install available updates. The command depends on which operating system you chose during provisioning:
+
+    **Ubuntu or Debian:**
+
+    ```bash
+    apt update && apt upgrade -y
+    ```
+
+    **CentOS:**
+
+    ```bash
+    yum update -y
+    ```
+
+    This usually takes 1–2 minutes. Your server is now patched and ready to use.
+  </Step>
+  <Step title="You're in!">
+    You now have full root access to your VPS. Install packages, configure services, and build whatever you like.
+  </Step>
+</Steps>
+
+<Tip>
+  Change your root password immediately after first login using the `passwd` command. Choose something strong and unique.
+</Tip>
+
+## What to do next
+
+<CardGroup cols={2}>
+  <Card title="Install a Web Server" icon="globe" href="/guides/install-web-server">
+    Host a website or web app with Nginx
+  </Card>
+
+  <Card title="Run a Discord Bot" icon="robot" href="/guides/run-a-bot">
+    Deploy and keep a bot online 24/7
+  </Card>
+
+  <Card title="Set Up a Game Server" icon="gamepad" href="/guides/setup-game-server">
+    Run Minecraft and other game servers
+  </Card>
+
+  <Card title="Learn the Control Panel" icon="gauge" href="/panel/overview">
+    Manage your VPS from the browser dashboard
+  </Card>
+</CardGroup>

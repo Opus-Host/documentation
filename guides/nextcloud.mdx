@@ -1,0 +1,148 @@
+---
+title: "Host Your Own Nextcloud Instance on Your Free VPS"
+sidebarTitle: "Nextcloud"
+description: "Self-host Nextcloud on your Opus Host VPS with Docker Compose — your own private cloud for files, calendars, and contacts, with HTTPS."
+---
+
+Nextcloud is a self-hosted alternative to Dropbox, Google Drive, and iCloud combined. Running it on your Opus Host VPS gives you a private cloud for files, calendars, contacts, and photos that you fully control.
+
+We will use Docker Compose because it is the fastest, cleanest way to get Nextcloud running with a proper database.
+
+## Prerequisites
+
+- Docker and Docker Compose installed. See [Docker](/guides/docker).
+- A domain pointing to your VPS. See [Custom Domain](/guides/custom-domain).
+- Ports 80 and 443 open. See [Firewall](/vps/firewall).
+
+## 1. Create the project folder
+
+```bash
+mkdir -p ~/nextcloud && cd ~/nextcloud
+```
+
+## 2. Write the compose file
+
+Create `docker-compose.yml`:
+
+```yaml
+services:
+  db:
+    image: mariadb:11
+    restart: unless-stopped
+    command: --transaction-isolation=READ-COMMITTED --log-bin=binlog --binlog-format=ROW
+    volumes:
+      - db:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: change-this-root-password
+      MYSQL_DATABASE: nextcloud
+      MYSQL_USER: nextcloud
+      MYSQL_PASSWORD: change-this-db-password
+
+  app:
+    image: nextcloud:stable
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    volumes:
+      - nextcloud:/var/www/html
+    environment:
+      MYSQL_HOST: db
+      MYSQL_DATABASE: nextcloud
+      MYSQL_USER: nextcloud
+      MYSQL_PASSWORD: change-this-db-password
+      NEXTCLOUD_TRUSTED_DOMAINS: cloud.example.com
+    depends_on:
+      - db
+
+volumes:
+  db:
+  nextcloud:
+```
+
+Replace the passwords and `cloud.example.com` with your own values.
+
+## 3. Start it
+
+```bash
+docker compose up -d
+```
+
+Check the logs until Nextcloud finishes initializing:
+
+```bash
+docker compose logs -f app
+```
+
+## 4. Put Nginx in front and add HTTPS
+
+Install Nginx if you have not already:
+
+```bash
+sudo apt install -y nginx
+```
+
+Create `/etc/nginx/sites-available/cloud.example.com`:
+
+```nginx
+server {
+    listen 80;
+    server_name cloud.example.com;
+    client_max_body_size 10G;
+
+    location / {
+        proxy_pass http://127.0.0.1:8080;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_request_buffering off;
+    }
+}
+```
+
+Enable it and reload:
+
+```bash
+sudo ln -s /etc/nginx/sites-available/cloud.example.com /etc/nginx/sites-enabled/
+sudo nginx -t
+sudo systemctl reload nginx
+```
+
+Add HTTPS with Certbot (see [Let's Encrypt SSL](/guides/lets-encrypt-ssl)):
+
+```bash
+sudo certbot --nginx -d cloud.example.com
+```
+
+## 5. Finish the setup in the browser
+
+Open `https://cloud.example.com` and create your admin account. Nextcloud will finish its first-run setup automatically.
+
+## Everyday commands
+
+```bash
+# View logs
+docker compose logs -f
+
+# Update to the latest Nextcloud version
+docker compose pull
+docker compose up -d
+
+# Run occ (Nextcloud's command-line tool)
+docker compose exec --user www-data app php occ status
+
+# Stop everything
+docker compose down
+```
+
+## Back it up
+
+Nextcloud's data lives in two Docker volumes (`db` and `nextcloud`). Include both in your backup strategy, or take a [panel backup](/panel/backups) of the whole VPS before major changes.
+
+<Tip>
+  Bump `client_max_body_size` in the Nginx config if you want to upload large files. The 10 GB above is a sensible default for a self-hosted cloud.
+</Tip>
+
+<Warning>
+  Nextcloud stores every file you upload plus a full database. Keep an eye on disk usage — see [Resource Limits](/vps/resource-limits) — or you will run out of space faster than you think.
+</Warning>

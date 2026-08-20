@@ -1,0 +1,86 @@
+---
+title: "Nano Editor Cheatsheet: Save, Exit, Search, and Copy"
+sidebarTitle: "Nano Cheatsheet"
+description: "The essential keyboard shortcuts for GNU nano — open a file, save changes, exit, search, and copy text on your Opus Host VPS."
+---
+
+Nano is the beginner-friendly text editor on your VPS. If you can only remember two shortcuts, remember `Ctrl+O` (save) and `Ctrl+X` (exit).
+
+In nano's help bar, `^` means the **Ctrl** key and `M-` means the **Alt** (meta) key.
+
+## Open a file
+
+```bash
+nano /etc/nginx/nginx.conf
+sudo nano /etc/nginx/nginx.conf   # for files that need root
+```
+
+## The essential shortcuts
+
+| Shortcut | What it does |
+| --- | --- |
+| `Ctrl+O` | Save ("WriteOut"). Press Enter to confirm the filename |
+| `Ctrl+X` | Exit. Prompts to save if there are unsaved changes |
+| `Ctrl+K` | Cut the current line |
+| `Ctrl+U` | Paste ("Uncut") the last cut line |
+| `Ctrl+W` | Search ("Where is") |
+| `Ctrl+\` | Search and replace |
+| `Ctrl+G` | Open help |
+
+## Navigation
+
+| Shortcut | What it does |
+| --- | --- |
+| Arrow keys | Move the cursor |
+| `Ctrl+A` | Jump to beginning of line |
+| `Ctrl+E` | Jump to end of line |
+| `Ctrl+Y` | Page up |
+| `Ctrl+V` | Page down |
+| `Ctrl+_` | Go to line number |
+
+## Selecting and copying
+
+1. Move the cursor to the start of the selection.
+2. Press `Ctrl+^` (or `Alt+A`) to mark the start.
+3. Move the cursor to the end of the selection.
+4. Press `Alt+6` to copy, or `Ctrl+K` to cut.
+5. Move to where you want to paste, press `Ctrl+U`.
+
+## Undo and redo
+
+| Shortcut | What it does |
+| --- | --- |
+| `Alt+U` | Undo |
+| `Alt+E` | Redo |
+
+## Common workflows
+
+### Save and exit
+
+1. `Ctrl+O`
+2. Enter (to confirm filename)
+3. `Ctrl+X`
+
+Or just `Ctrl+X`, then `Y`, then Enter. Nano will prompt to save on the way out.
+
+### Exit without saving
+
+1. `Ctrl+X`
+2. `N` (do not save)
+
+### Search for text
+
+1. `Ctrl+W`
+2. Type the search string, press Enter.
+3. `Alt+W` finds the next match.
+
+### Find and replace
+
+1. `Ctrl+\`
+2. Type the search string, press Enter.
+3. Type the replacement, press Enter.
+4. `Y` for each match to replace, `A` to replace all.
+
+<Tip>
+  If you paste into nano from your local clipboard and see indentation exploding, run `Alt+I` to disable auto-indent, then paste again.
+</Tip>

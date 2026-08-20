@@ -1,0 +1,143 @@
+---
+title: "Set Up a Minecraft Java Edition Server on Your VPS"
+sidebarTitle: "Game Server"
+description: "Install and run a Minecraft Java Edition server on your Opus Host VPS — invite friends, configure the server, and keep it running 24/7."
+---
+
+Your Opus Host VPS can run a Minecraft server 24/7 so you and your friends can play anytime. This guide covers installing Java, setting up the server, and keeping it running in the background — even after you close your terminal.
+
+<Note>
+  We recommend a VPS with at least **1 GB of RAM** for a smooth experience. Check [Resource Limits](/vps/resource-limits) to see your current allocation. You also need port **25565** open before players can connect — see [Networking](/panel/networking).
+</Note>
+
+## Install Java
+
+<Steps>
+  <Step title="Update packages">
+    Refresh your package lists to make sure you install the latest available versions:
+
+    ```bash
+    apt update
+    ```
+  </Step>
+  <Step title="Install Java 17">
+    Minecraft 1.17 and later require Java 17. Install the headless JRE (no desktop environment needed on a VPS):
+
+    ```bash
+    apt install openjdk-17-jre-headless -y
+    ```
+  </Step>
+  <Step title="Verify the installation">
+    Confirm Java is installed and check the version:
+
+    ```bash
+    java -version
+    ```
+
+    You should see output similar to `openjdk version "17.x.x"`.
+  </Step>
+</Steps>
+
+## Download and Run the Minecraft Server
+
+<Steps>
+  <Step title="Create a dedicated folder">
+    Keep all server files in one place:
+
+    ```bash
+    mkdir ~/minecraft && cd ~/minecraft
+    ```
+  </Step>
+  <Step title="Download the server JAR">
+    Mojang updates the server JAR regularly, so you need to grab the current download link yourself:
+
+    1. Visit the [Minecraft server download page](https://www.minecraft.net/en-us/download/server) in your browser.
+    2. Right-click the **minecraft\_server.X.X.X.jar** download button and copy the link address.
+    3. Back on your VPS, use `wget` with that copied URL:
+
+    ```bash
+    wget -O server.jar "PASTE_THE_COPIED_URL_HERE"
+    ```
+
+    For example, the command will look similar to:
+
+    ```bash
+    wget -O server.jar "https://piston-data.mojang.com/v1/objects/<hash>/server.jar"
+    ```
+
+    where `<hash>` is the unique identifier for the version you downloaded.
+  </Step>
+  <Step title="Accept the EULA">
+    Minecraft requires you to accept the End User License Agreement before the server will start:
+
+    ```bash
+    echo "eula=true" > eula.txt
+    ```
+  </Step>
+  <Step title="Start the server for the first time">
+    Launch the server with modest memory limits suitable for a free-tier VPS. This first run generates the world and all default config files:
+
+    ```bash
+    java -Xmx768M -Xms256M -jar server.jar nogui
+    ```
+  </Step>
+  <Step title="Stop the server">
+    Once the world has finished generating and you see the `Done` message in the console, type `stop` and press Enter to shut it down cleanly before moving on to the next section.
+  </Step>
+</Steps>
+
+## Keep It Running with screen
+
+Closing your SSH session normally kills any processes running in it. `screen` lets the server keep running in the background.
+
+<Steps>
+  <Step title="Install screen">
+    ```bash
+    apt install screen -y
+    ```
+  </Step>
+  <Step title="Start a named screen session">
+    ```bash
+    screen -S minecraft
+    ```
+
+    Your terminal is now inside a persistent session named `minecraft`.
+  </Step>
+  <Step title="Launch the server inside screen">
+    ```bash
+    java -Xmx768M -Xms256M -jar server.jar nogui
+    ```
+  </Step>
+  <Step title="Detach from screen">
+    Press **Ctrl \+ A**, then **D** to detach. The server continues running in the background and your SSH session is free.
+  </Step>
+  <Step title="Reattach later">
+    When you need to access the server console again — to run commands, check logs, or stop the server — reattach with:
+
+    ```bash
+    screen -r minecraft
+    ```
+  </Step>
+</Steps>
+
+## Configure the Server
+
+All core server settings live in `~/minecraft/server.properties`. Open the file with a text editor and adjust the values to suit your needs:
+
+| Property | Description |
+| --- | --- |
+| `max-players` | Maximum number of players allowed online at once. |
+| `difficulty` | Game difficulty: `peaceful`, `easy`, `normal`, or `hard`. |
+| `gamemode` | Default game mode: `survival`, `creative`, `adventure`, or `spectator`. |
+| `online-mode` | Set to `false` to allow cracked (non-premium) clients. |
+| `motd` | The message of the day shown in the server list. |
+
+After editing `server.properties`, restart the server for your changes to take effect.
+
+<Tip>
+  For better performance on low-RAM machines, consider using **PaperMC** instead of the vanilla server JAR. PaperMC includes significant optimizations and runs noticeably smoother under 1 GB of RAM. Download it from [papermc.io](https://papermc.io).
+</Tip>
+
+<Note>
+  Remember to open port **25565 TCP** in the [Networking panel](/panel/networking). Players connect to `YOUR_SERVER_IP:25565` — if the port is closed, they'll see a connection timeout.
+</Note>

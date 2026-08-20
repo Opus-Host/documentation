@@ -1,0 +1,67 @@
+---
+title: "VPS Networking: Manage IP Addresses and Open Ports"
+sidebarTitle: "Networking"
+description: "View your VPS IP address, manage open ports, and configure firewall rules directly from the Opus Host control panel networking tab."
+---
+
+The **Networking** section of the Opus Host control panel shows you everything related to how your VPS connects to the internet. From here you can find your public IP address, control which ports are open to incoming and outgoing traffic, and configure advanced options like reverse DNS. Managing your network settings correctly is essential for keeping your services reachable and your server secure.
+
+## Your IP address
+
+When your VPS is provisioned, it is automatically assigned one public IPv4 address. You can find this address displayed at the top of the **Networking** tab. Keep the following in mind:
+
+- Your IP address is **static** — it does not change between reboots or while your VPS exists.
+- Your IP address **will change** if you reinstall the OS (a new address may be assigned) or if you contact support to request a new IP.
+- Use this IP address to point domain names, connect via SSH, and expose services to the internet.
+
+## Port management
+
+Opus Host includes a built-in firewall that controls which ports are accessible from the internet. By default, only essential ports are open. You can add or remove port rules at any time from the panel.
+
+<Steps>
+  <Step title="Go to the Networking tab">
+    Select your VPS from the dashboard, then click **Networking** in the left sidebar.
+  </Step>
+  <Step title="Scroll to Port Rules">
+    Find the **Port Rules** section, which lists all currently active inbound and outbound rules.
+  </Step>
+  <Step title="Click Add Rule">
+    Click the **Add Rule** button to open the new rule form.
+  </Step>
+  <Step title="Enter the rule details">
+    Fill in the **port number**, select the **protocol** (TCP or UDP), and choose the **direction** (Inbound for traffic coming in, Outbound for traffic going out).
+  </Step>
+  <Step title="Click Save">
+    Click **Save** to apply the rule. The firewall is updated immediately — no reboot required.
+  </Step>
+</Steps>
+
+Some ports are **blocked by default** and cannot be opened through the panel. For example, **port 25 (SMTP)** is blocked on all new VPS instances to prevent spam. If you need port 25 unblocked for a legitimate mail server, contact Opus Host support with details about your use case.
+
+## Common ports
+
+Here is a reference table of frequently used ports and the services they correspond to:
+
+| Port | Protocol | Service |
+| --- | --- | --- |
+| `22` | TCP | SSH (secure shell access) |
+| `80` | TCP | HTTP (unencrypted web traffic) |
+| `443` | TCP | HTTPS (encrypted web traffic) |
+| `3306` | TCP | MySQL / MariaDB database |
+| `25565` | TCP | Minecraft Java Edition |
+| `27015` | TCP/UDP | Steam games (e.g. Counter-Strike) |
+| `19132` | UDP | Minecraft Bedrock Edition |
+
+<Note>
+  Opening a port in the panel only tells the firewall to allow traffic on that port. It does **not** automatically start any service. You still need to install and configure the appropriate software on your VPS for that port to serve anything.
+</Note>
+
+<Warning>
+  Only open ports that your active services genuinely need. Every open port is a potential entry point for unauthorized access. Review your port rules regularly and close any ports that are no longer in use.
+</Warning>
+
+## Reverse DNS (rDNS)
+
+Reverse DNS (rDNS) lets you assign a custom hostname to your VPS's IP address. Instead of an IP lookup returning a generic hostname, it will return a domain name you specify — for example, `mail.yourdomain.com`. This is particularly important for **mail servers**, as many receiving mail servers check rDNS records and may reject email from IPs without a matching hostname.
+
+Opus Host does not currently offer self-serve rDNS configuration through the panel. To request a custom rDNS record for your IP address, contact the FreeHost support team with your desired hostname. Make sure your domain's A record already points to your VPS IP before making the request.

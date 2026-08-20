@@ -1,0 +1,82 @@
+---
+title: "Opus Host File Manager: Upload and Edit Server Files"
+sidebarTitle: "File Manager"
+description: "Browse, upload, download, and edit files on your VPS directly from the Opus Host control panel — no FTP client or SSH file transfer needed."
+---
+
+The Opus Host file manager gives you a graphical interface to your VPS filesystem right inside the control panel. You can browse directories, upload files from your local computer, edit configuration files and scripts in-browser, and manage your server's files without needing an FTP client, `scp`, or any other external tool. It's the fastest way to make quick file changes without opening a terminal.
+
+## Opening the file manager
+
+<Steps>
+  <Step title="Log in to the panel">
+    Go to [opus-host.de/login](http://opus-host.de/login) and sign in to your account.
+  </Step>
+  <Step title="Click your VPS">
+    From the dashboard, select the VPS whose files you want to manage.
+  </Step>
+  <Step title="Click the File Manager tab">
+    Select **File Manager** from the left sidebar. The file browser will load, starting in your home directory (`/root` for most VPS configurations).
+  </Step>
+</Steps>
+
+## Navigating files
+
+The file manager presents your VPS filesystem in a familiar folder-and-file layout:
+
+- **Click a folder** to open it and see its contents.
+- **Breadcrumb navigation** at the top of the panel shows your current path (e.g. `/ › var › www › html`) — click any segment to jump back to that level.
+- **Path bar** displays the full absolute path of the directory you're currently viewing, and you can type a path directly into it to jump there instantly.
+- **Refresh button** reloads the current directory listing to reflect any changes made via the console or SSH.
+
+## Uploading files
+
+<Steps>
+  <Step title="Navigate to the target directory">
+    Use the folder browser to open the directory where you want the files to land.
+  </Step>
+  <Step title="Click Upload">
+    Click the **Upload** button in the toolbar at the top of the file manager.
+  </Step>
+  <Step title="Select your files">
+    Choose one or more files from your local computer using the file picker that appears. You can select multiple files at once.
+  </Step>
+  <Step title="Wait for the upload to complete">
+    A progress bar will appear for each file being uploaded. Once all progress bars reach 100%, your files are available on the server.
+  </Step>
+</Steps>
+
+## Editing a file
+
+<Steps>
+  <Step title="Click a text file">
+    Click any editable text file — such as a `.txt`, `.conf`, `.html`, `.css`, `.js`, or `.py` file — to open it in the inline editor.
+  </Step>
+  <Step title="The editor opens inline">
+    The file's contents appear in a code editor embedded in the panel, with syntax highlighting for common file types.
+  </Step>
+  <Step title="Make your changes">
+    Edit the file contents directly. You can use standard keyboard shortcuts like `Ctrl+Z` to undo.
+  </Step>
+  <Step title="Click Save">
+    Click the **Save** button to write your changes to the server. The file is updated immediately.
+  </Step>
+</Steps>
+
+## Other actions
+
+Right-clicking a file or folder — or selecting it and using the action toolbar — gives you access to the following operations:
+
+- **Delete** — permanently removes the selected file or folder and all of its contents.
+- **Rename** — change the name of a file or folder in place.
+- **Create new folder** — creates an empty directory inside the current location.
+- **Create new file** — creates a blank file that you can immediately open and edit.
+- **Download** — downloads the selected file directly to your local computer.
+
+<Warning>
+  Deleting files in the file manager is **permanent** — there is no recycle bin or undo option. Always keep backups of important configuration files and data before making destructive changes.
+</Warning>
+
+<Tip>
+  For large file transfers over a few hundred MB, the file manager may be slow or time out. In those cases, use `scp` or `rsync` over SSH for a faster and more reliable transfer.
+</Tip>

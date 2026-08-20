@@ -1,0 +1,114 @@
+{
+  "$schema": "https://mintlify.com/docs.json",
+  "name": "Opus Host",
+  "theme": "almond",
+  "colors": {
+    "primary": "#ef7025",
+    "light": "#eec9bc",
+    "dark": "#4fa1ab"
+  },
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Documentation",
+        "groups": [
+          {
+            "group": "Get Started",
+            "pages": [
+              "important-pages",
+              "introduction",
+              "claim-your-vps",
+              "quickstart"
+            ]
+          },
+          {
+            "group": "Control Panel",
+            "pages": [
+              "panel/overview",
+              "panel/console",
+              "panel/file-manager",
+              "panel/networking",
+              "panel/backups"
+            ]
+          },
+          {
+            "group": "Managing Your VPS",
+            "pages": [
+              "vps/start-stop-restart",
+              "vps/reinstall-os",
+              "vps/ssh-access",
+              "vps/resource-limits",
+              "vps/firewall",
+              "vps/user-management",
+              "vps/package-updates",
+              "vps/cron-jobs",
+              "vps/systemd-services",
+              "vps/swap-and-performance"
+            ]
+          },
+          {
+            "group": "Guides",
+            "pages": [
+              "guides/first-10-minutes",
+              "guides/install-web-server",
+              "guides/setup-game-server",
+              "guides/run-a-bot",
+              "guides/custom-domain",
+              "guides/docker",
+              "guides/lets-encrypt-ssl",
+              "guides/wordpress",
+              "guides/databases",
+              "guides/nodejs-pm2",
+              "guides/wireguard-vpn",
+              "guides/nginx-reverse-proxy",
+              "guides/telegram-bot",
+              "guides/nextcloud"
+            ]
+          },
+          {
+            "group": "Account & Billing",
+            "pages": [
+              "account/register",
+              "account/renew",
+              "account/rules"
+            ]
+          },
+          {
+            "group": "Reference",
+            "pages": [
+              "reference/glossary",
+              "reference/os-images",
+              "reference/linux-cli-cheatsheet",
+              "reference/nano-cheatsheet",
+              "reference/ports"
+            ]
+          },
+          {
+            "group": "FAQ & Support",
+            "pages": [
+              "support/legal",
+              "faq",
+              "troubleshooting",
+              "support/contact",
+              "support/report-abuse",
+              "support/unblock-mail-ports",
+              "support/data-deletion"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "navbar": {
+    "primary": {
+      "type": "button",
+      "label": "Claim Free VPS",
+      "href": "/claim-your-vps"
+    }
+  },
+  "logo": {
+    "light": "/images/opus-host-removebg-preview.png",
+    "dark": "/images/opus-host-removebg-preview.png",
+    "href": "https://opus-host.de"
+  }
+}

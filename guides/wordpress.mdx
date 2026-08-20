@@ -1,0 +1,91 @@
+---
+title: "Host a WordPress Site on Your Opus Host VPS"
+sidebarTitle: "WordPress"
+description: "Install and run a WordPress site on your Opus Host VPS with Nginx, PHP, and MySQL — a full LEMP stack from scratch."
+---
+
+WordPress powers a huge share of the web because it is flexible and easy to use. This guide walks through installing it on your Opus Host VPS with Nginx, PHP-FPM, and MySQL (a LEMP stack).
+
+## 1. Install Nginx, MySQL, and PHP
+
+```bash
+sudo apt update
+sudo apt install -y nginx mysql-server php-fpm php-mysql php-curl php-gd \
+  php-mbstring php-xml php-zip php-imagick unzip
+```
+
+## 2. Create the WordPress database
+
+```bash
+sudo mysql
+```
+
+At the MySQL prompt:
+
+```sql
+CREATE DATABASE wordpress;
+CREATE USER 'wpuser'@'localhost' IDENTIFIED BY 'change-this-password';
+GRANT ALL PRIVILEGES ON wordpress.* TO 'wpuser'@'localhost';
+FLUSH PRIVILEGES;
+EXIT;
+```
+
+## 3. Download WordPress
+
+```bash
+cd /tmp
+curl -O https://wordpress.org/latest.tar.gz
+tar xzf latest.tar.gz
+sudo mv wordpress /var/www/example.com
+sudo chown -R www-data:www-data /var/www/example.com
+```
+
+## 4. Configure Nginx
+
+Create `/etc/nginx/sites-available/example.com`:
+
+```nginx
+server {
+    listen 80;
+    server_name example.com www.example.com;
+    root /var/www/example.com;
+    index index.php index.html;
+
+    location / {
+        try_files $uri $uri/ /index.php?$args;
+    }
+
+    location ~ \.php$ {
+        include snippets/fastcgi-php.conf;
+        fastcgi_pass unix:/run/php/php-fpm.sock;
+    }
+
+    location ~ /\.ht {
+        deny all;
+    }
+}
+```
+
+Enable it and reload:
+
+```bash
+sudo ln -s /etc/nginx/sites-available/example.com /etc/nginx/sites-enabled/
+sudo nginx -t
+sudo systemctl reload nginx
+```
+
+## 5. Finish the install in the browser
+
+Visit `http://example.com` and complete the WordPress setup wizard. Use the database name, user, and password from step 2.
+
+## 6. Add HTTPS
+
+Once your site loads, secure it with a free certificate. See [Let's Encrypt SSL](/guides/lets-encrypt-ssl).
+
+<Tip>
+  Do not run WordPress as `root`. The `www-data` ownership set above is important — it lets PHP-FPM update files (like plugins and themes) without opening security holes.
+</Tip>
+
+<Warning>
+  Change the default admin username during setup and use a long, unique password. WordPress login pages get brute-forced constantly.
+</Warning>

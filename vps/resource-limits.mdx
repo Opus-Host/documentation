@@ -1,0 +1,87 @@
+---
+title: "VPS Resource Limits and Usage Monitoring on Opus Host"
+sidebarTitle: "Resource Limits"
+description: "Learn about the CPU, RAM, disk, and bandwidth limits on your Opus Host VPS and how to monitor resource usage to keep your server running smoothly."
+---
+
+Every Opus Host VPS comes with a fixed allocation of CPU, RAM, disk space, and bandwidth. Running within these limits keeps your server stable and ensures fair performance for everyone on the platform. This page explains what those limits are, how to monitor your usage, and what you can do if you're running low.
+
+## Free VPS specifications
+
+The Opus Host free tier provides the following resources for each VPS:
+
+| Resource | Allocation |
+| --- | --- |
+| CPU | 1 vCPU |
+| RAM | 512 MB – 1 GB |
+| SSD Storage | 10 – 20 GB |
+| Bandwidth | Fair-use (shared) |
+| Network Speed | Up to 100 Mbps |
+
+These specs are well-suited for lightweight workloads such as personal projects, small websites, bots, or learning environments. If your application grows beyond these limits, consider optimizing your resource usage using the tips in this guide.
+
+## Monitoring resource usage
+
+### From the control panel
+
+The Opus Host dashboard includes a live resource overview for each VPS. Log in to the [Opus Host control panel](https://opus-host.de/login), select your VPS, and look for:
+
+- **CPU gauge** — shows current CPU utilization as a percentage.
+- **RAM bar** — displays how much memory is currently in use versus the total available.
+- **Disk usage %** — shows how much of your SSD storage is occupied.
+
+These metrics update in near real-time and are a quick way to spot a misbehaving process or a resource spike.
+
+### From the command line
+
+For a more detailed view, connect to your VPS over SSH and use these commands:
+
+```bash
+# CPU and RAM usage — live, interactive view
+htop
+
+# Disk usage across all mounted filesystems
+df -h
+
+# Memory details including swap
+free -h
+```
+
+`htop` is particularly useful because it shows per-process CPU and memory consumption. You can sort by CPU or RAM usage to quickly identify which process is responsible for high utilization. If `htop` is not installed, run `apt install htop -y`.
+
+## What happens when you hit limits
+
+If your VPS consistently exceeds its resource allocation, here's what you can expect:
+
+- **CPU throttling** — When CPU usage is sustained at 100%, the hypervisor throttles your vCPU. Processes don't crash, but they slow down noticeably. Your server may feel sluggish or unresponsive.
+- **RAM exhaustion** — When all available RAM is used up, the Linux kernel's **OOM (Out of Memory) killer** starts terminating processes to free up memory — usually picking the most memory-hungry ones first. This can take down your web server, database, or other critical services unexpectedly.
+- **Disk full** — When your disk reaches 100% capacity, all write operations fail. This can cause application crashes, log errors, and even prevent the OS from functioning correctly. Clean up files immediately if this happens.
+
+If you hit any of these limits, start by stopping unused services and cleaning up unnecessary files to bring usage back down.
+
+## Tips to stay within limits
+
+- **Remove old log files** to reclaim disk space quickly:
+  ```bash
+  journalctl --vacuum-time=3d
+  ```
+  This deletes system journal logs older than 3 days.
+- **Stop services you're not using.** Each running service consumes RAM even when idle. Disable any services you don't need:
+  ```bash
+  systemctl stop servicename
+  systemctl disable servicename
+  ```
+- **Use lightweight software alternatives.** For example, **Nginx** uses significantly less RAM than **Apache** and is a better fit for servers with 512 MB or 1 GB of RAM.
+- **Check what's consuming the most RAM** with a quick one-liner:
+  ```bash
+  ps aux --sort=-%mem | head
+  ```
+  This lists the top processes sorted by memory usage, making it easy to identify and address the biggest consumers.
+- **Clean up unused packages and cached files:**
+  ```bash
+  apt autoremove -y && apt clean
+  ```
+
+<Note>
+  Opus Host enforces fair-use resource limits to keep the platform free for everyone. Sustained high CPU usage may result in throttling of your VPS. If you consistently need more resources than the free tier provides, consider optimizing your workload or upgrading to a paid plan.
+</Note>

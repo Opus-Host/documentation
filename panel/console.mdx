@@ -1,0 +1,53 @@
+---
+title: "In-Browser Console: Run Commands on Your VPS Instantly"
+sidebarTitle: "Console"
+description: "The Opus Host web console gives you a full terminal inside your browser — run commands on your VPS without installing SSH or any software."
+---
+
+The Opus Host web console is a full terminal emulator embedded directly in your browser. It gives you immediate command-line access to your VPS without needing to install an SSH client, configure keys, or open any ports. This makes it especially useful when you're on a new device, locked out of SSH, or just want to run a quick command without switching applications.
+
+## Opening the console
+
+<Steps>
+  <Step title="Log in to the panel">
+    Go to [opus-host.de/login](http://opus-host.de/login) and sign in to your account.
+  </Step>
+  <Step title="Click your VPS">
+    From the dashboard, click the VPS you want to access.
+  </Step>
+  <Step title="Click the Console tab">
+    Select the **Console** tab from the left sidebar. The terminal will load in your browser within a few seconds and present a login prompt.
+  </Step>
+</Steps>
+
+## Using the console
+
+The in-browser terminal behaves like a standard Linux terminal. Keep the following tips in mind while using it:
+
+- **Type commands normally** — the console accepts the same commands you'd run over SSH.
+- **Copy and paste** — use `Ctrl+Shift+C` to copy and `Ctrl+Shift+V` to paste in most browsers. On macOS, `Cmd+C` / `Cmd+V` may work depending on your browser.
+- **Session persistence** — your terminal session stays alive as long as the browser tab remains open. Switching to another tab does not disconnect you.
+- **Closing the session** — type `exit` to log out of the current shell session cleanly.
+
+## Common commands
+
+Here are some frequently used commands to get you started:
+
+| Command | Description |
+| --- | --- |
+| `ls -la` | List all files in the current directory, including hidden ones. |
+| `cd /var/www` | Navigate to a specific directory. |
+| `apt install nginx` | Install a package using the APT package manager. |
+| `systemctl status nginx` | Check whether a service is running. |
+| `df -h` | Check disk usage in a human-readable format. |
+| `htop` | View real-time CPU, RAM, and process usage interactively. |
+
+<Tip>
+  The console is best suited for quick, one-off commands. For longer working sessions, file transfers, or anything requiring a stable connection, use SSH instead — it's faster and more resilient.
+</Tip>
+
+<Warning>
+  If you close the browser tab, any commands that are actively running in the foreground will stop immediately. To keep processes running after closing the tab, background them with `&` or use a terminal multiplexer like `screen` or `tmux`.
+</Warning>
+
+See [SSH Access](/vps/ssh-access) for a persistent terminal connection that survives browser closures and network hiccups.

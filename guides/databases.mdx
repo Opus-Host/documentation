@@ -1,0 +1,100 @@
+---
+title: "Install MySQL or PostgreSQL on Your Opus Host VPS"
+sidebarTitle: "Databases"
+description: "Install and secure MySQL or PostgreSQL on your Opus Host VPS, create databases and users, and connect from your applications."
+---
+
+Most apps need a database. This guide covers installing and securing MySQL and PostgreSQL, the two most common options, on your Opus Host VPS.
+
+<Tabs>
+  <Tab title="MySQL">
+    ## Install MySQL
+
+    ```bash
+    sudo apt update
+    sudo apt install -y mysql-server
+    ```
+
+    ## Secure the installation
+
+    ```bash
+    sudo mysql_secure_installation
+    ```
+
+    Answer **Y** to remove anonymous users, disallow remote root login, remove the test database, and reload privileges.
+
+    ## Create a database and user
+
+    ```bash
+    sudo mysql
+    ```
+
+    ```sql
+    CREATE DATABASE myapp;
+    CREATE USER 'myuser'@'localhost' IDENTIFIED BY 'change-this-password';
+    GRANT ALL PRIVILEGES ON myapp.* TO 'myuser'@'localhost';
+    FLUSH PRIVILEGES;
+    EXIT;
+    ```
+
+    ## Connect from the command line
+
+    ```bash
+    mysql -u myuser -p myapp
+    ```
+  </Tab>
+  <Tab title="PostgreSQL">
+    ## Install PostgreSQL
+
+    ```bash
+    sudo apt update
+    sudo apt install -y postgresql postgresql-contrib
+    ```
+
+    ## Create a database and user
+
+    Switch to the `postgres` system user and open the psql shell:
+
+    ```bash
+    sudo -u postgres psql
+    ```
+
+    ```sql
+    CREATE DATABASE myapp;
+    CREATE USER myuser WITH ENCRYPTED PASSWORD 'change-this-password';
+    GRANT ALL PRIVILEGES ON DATABASE myapp TO myuser;
+    \q
+    ```
+
+    ## Connect from the command line
+
+    ```bash
+    psql -h localhost -U myuser -d myapp
+    ```
+  </Tab>
+</Tabs>
+
+## Allow remote connections (optional)
+
+By default both databases only accept connections from `localhost`, which is the safest setup. If your app runs on the same VPS, leave it that way. If you truly need remote access:
+
+1. Bind the database to `0.0.0.0` in its config (`/etc/mysql/mysql.conf.d/mysqld.cnf` or `/etc/postgresql/*/main/postgresql.conf`).
+2. Update the client authentication file (`pg_hba.conf` for PostgreSQL).
+3. Open the port in your firewall. See [Firewall](/vps/firewall).
+4. Restart the service.
+
+<Warning>
+  Never expose a database to the public internet without a strong password, a firewall rule limiting source IPs, and TLS. Databases are constantly scanned and brute-forced.
+</Warning>
+
+## Back up a database
+
+```bash
+# MySQL
+mysqldump -u myuser -p myapp > myapp-backup.sql
+
+# PostgreSQL
+pg_dump -U myuser myapp > myapp-backup.sql
+```
+
+Automate this with a [cron job](/vps/cron-jobs).

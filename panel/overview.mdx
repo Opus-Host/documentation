@@ -1,0 +1,59 @@
+---
+title: "Opus Host Control Panel: Manage Your VPS From Your Browser"
+sidebarTitle: "Overview"
+description: "The Opus Host control panel lets you start, stop, and configure your VPS from any browser — no SSH required for everyday management tasks."
+---
+
+The Opus Host control panel is your main hub for managing every aspect of your VPS. Whether you need to reboot your server, check resource usage, or reconfigure your network settings, you can do it all from a browser without ever opening a terminal. It's designed to give you full control with minimal friction, whether you're a seasoned sysadmin or just getting started.
+
+## Dashboard overview
+
+When you log in and select your VPS, the dashboard gives you an at-a-glance summary of everything important. You'll see the following at the top of the page:
+
+- **VPS status indicator** — shows whether your server is currently **Online** or **Offline**, updated in real time.
+- **Resource gauges** — live meters for CPU usage (%), RAM usage (%), and disk usage (%), so you can spot performance issues at a glance.
+- **Quick action buttons** — one-click buttons to **Start**, **Stop**, or **Restart** your VPS without navigating away.
+- **Server details** — a summary panel listing your public IP address, installed OS, hosting region, and current uptime.
+
+## Navigation
+
+The left sidebar gives you access to every section of your VPS management panel. The following links are always available:
+
+- **Console** — open a full in-browser terminal to run commands on your VPS directly.
+- **File Manager** — browse, upload, download, and edit files on your server without an FTP client.
+- **Networking** — view your IP address, manage port rules, and configure firewall settings.
+- **Settings** — update your VPS label, change your OS, manage SSH keys, and more.
+
+## Quick actions
+
+From the dashboard you can perform the most common server management tasks in a single click:
+
+| Action | Description |
+| --- | --- |
+| **Start server** | Powers on your VPS if it is currently offline. |
+| **Stop server** | Gracefully shuts down your VPS. |
+| **Restart server** | Reboots your VPS, applying any pending changes. |
+| **Reinstall OS** | Wipes the disk and provisions a fresh operating system image. |
+| **View logs** | Opens the server activity and system log viewer. |
+
+<Note>
+  All actions taken in the panel take effect immediately. Use **Stop** and **Restart** with care if you have running services — active connections and unsaved processes will be interrupted.
+</Note>
+
+<CardGroup cols={2}>
+  <Card title="Console" icon="terminal" href="/panel/console">
+    Run commands on your VPS directly from a browser-based terminal.
+  </Card>
+
+  <Card title="File Manager" icon="folder-open" href="/panel/file-manager">
+    Upload, download, and edit files on your server without FTP or SSH.
+  </Card>
+
+  <Card title="Networking" icon="network-wired" href="/panel/networking">
+    Manage your VPS IP address, firewall rules, and open ports.
+  </Card>
+
+  <Card title="SSH Access" icon="key" href="/vps/ssh-access">
+    Connect to your VPS with a persistent SSH session from your local machine.
+  </Card>
+</CardGroup>

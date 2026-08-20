@@ -1,0 +1,90 @@
+---
+title: "Run Apps as systemd Services on Your Opus Host VPS"
+sidebarTitle: "systemd Services"
+description: "Keep your apps running after logout and reboot. Create, enable, and manage systemd services on your Opus Host VPS with a copy-paste template."
+---
+
+When you close your SSH session, anything you started in that shell dies with it. systemd fixes this: it runs your app as a background service, restarts it if it crashes, and starts it automatically when the server boots. If you want a bot, web app, or game server to just stay up, this is how you do it.
+
+## Anatomy of a service file
+
+Systemd service files live in `/etc/systemd/system/` and end in `.service`. Here is a template you can adapt for any long-running app:
+
+```ini
+[Unit]
+Description=My App
+After=network.target
+
+[Service]
+Type=simple
+User=alice
+WorkingDirectory=/home/alice/myapp
+ExecStart=/usr/bin/node /home/alice/myapp/index.js
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
+```
+
+Key fields:
+
+- **User** — which user the process runs as. Avoid `root` when possible.
+- **WorkingDirectory** — the app's working directory, as if you had `cd`'d there.
+- **ExecStart** — the command to run. Use absolute paths.
+- **Restart=on-failure** — restart if the process exits with an error.
+
+## Create and enable a service
+
+<Steps>
+  <Step title="Write the service file">
+    ```bash
+    sudo nano /etc/systemd/system/myapp.service
+    ```
+
+    Paste the template above and adjust the fields for your app.
+  </Step>
+  <Step title="Reload systemd so it picks up the new file">
+    ```bash
+    sudo systemctl daemon-reload
+    ```
+  </Step>
+  <Step title="Start the service">
+    ```bash
+    sudo systemctl start myapp
+    ```
+  </Step>
+  <Step title="Enable it on boot">
+    ```bash
+    sudo systemctl enable myapp
+    ```
+  </Step>
+</Steps>
+
+## Manage a service
+
+```bash
+sudo systemctl status myapp     # show current state
+sudo systemctl stop myapp       # stop
+sudo systemctl restart myapp    # restart
+sudo systemctl disable myapp    # stop starting on boot
+```
+
+## View logs
+
+systemd captures your app's stdout and stderr automatically — no log file setup required.
+
+```bash
+# Follow logs in real time
+sudo journalctl -u myapp -f
+
+# Show the last 100 lines
+sudo journalctl -u myapp -n 100
+
+# Only logs since the last boot
+sudo journalctl -u myapp -b
+```
+
+<Tip>
+  If your service fails to start, `sudo systemctl status myapp` usually tells you why in the last few lines of output. When it does not, `journalctl -u myapp -n 50` will.
+</Tip>

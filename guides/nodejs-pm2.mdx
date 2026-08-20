@@ -1,0 +1,102 @@
+---
+title: "Deploy a Node.js App With PM2 on Your VPS"
+sidebarTitle: "Node.js & PM2"
+description: "Install Node.js and PM2 on your Opus Host VPS, deploy your app, and keep it running 24/7 with auto-restart on crashes and reboots."
+---
+
+PM2 is the go-to process manager for Node.js. It restarts your app if it crashes, brings it back after a reboot, and gives you clean logs. Combine it with your Opus Host VPS and your app just stays online.
+
+## 1. Install Node.js
+
+```bash
+curl -fsSL https://deb.nodesource.com/setup_20.x | sudo bash -
+sudo apt install -y nodejs
+node --version
+npm --version
+```
+
+## 2. Get your app onto the server
+
+Clone from Git or upload via the [File Manager](/panel/file-manager):
+
+```bash
+git clone https://github.com/yourusername/myapp.git ~/myapp
+cd ~/myapp
+npm install --production
+```
+
+## 3. Install PM2
+
+```bash
+sudo npm install -g pm2
+```
+
+## 4. Start your app with PM2
+
+```bash
+pm2 start index.js --name myapp
+```
+
+For apps with a start script in `package.json`:
+
+```bash
+pm2 start npm --name myapp -- start
+```
+
+## 5. Save and enable auto-start on reboot
+
+```bash
+pm2 startup
+pm2 save
+```
+
+Copy and run the `sudo env PATH=...` command that `pm2 startup` prints. That registers PM2 as a systemd service.
+
+## Common PM2 commands
+
+```bash
+pm2 status              # list all processes
+pm2 logs myapp          # tail logs
+pm2 restart myapp       # restart the app
+pm2 reload myapp        # zero-downtime reload (for clustered apps)
+pm2 stop myapp          # stop
+pm2 delete myapp        # remove from PM2
+pm2 monit               # live CPU/memory dashboard
+```
+
+## Run multiple instances (cluster mode)
+
+Use all available CPU cores automatically:
+
+```bash
+pm2 start index.js --name myapp -i max
+```
+
+## Environment variables
+
+Create an `ecosystem.config.js` file for cleaner deploys:
+
+```javascript
+module.exports = {
+  apps: [{
+    name: "myapp",
+    script: "./index.js",
+    instances: "max",
+    exec_mode: "cluster",
+    env: {
+      NODE_ENV: "production",
+      PORT: 3000
+    }
+  }]
+};
+```
+
+Start with:
+
+```bash
+pm2 start ecosystem.config.js
+```
+
+<Tip>
+  Put Nginx in front of your Node.js app as a reverse proxy so you can serve it on port 80/443 with HTTPS. See [Nginx Reverse Proxy](/guides/nginx-reverse-proxy).
+</Tip>

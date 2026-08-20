@@ -1,0 +1,84 @@
+---
+title: "Create Users and Manage sudo Access on Your VPS"
+sidebarTitle: "User Management"
+description: "Stop using root for daily work. Create a regular user, grant sudo access, disable root login, and manage user accounts on your Opus Host VPS."
+---
+
+Running everything as `root` is convenient and dangerous. A single typo can wipe your server, and any process you launch inherits full system privileges. The standard practice is to create a regular user, grant it `sudo`, and use `root` only when you really need to.
+
+## Create a new user
+
+<Steps>
+  <Step title="Add the user">
+    ```bash
+    sudo adduser alice
+    ```
+
+    You will be prompted for a password and some optional profile fields (press Enter to skip).
+  </Step>
+  <Step title="Grant sudo privileges">
+    ```bash
+    sudo usermod -aG sudo alice
+    ```
+  </Step>
+  <Step title="Test the new account">
+    ```bash
+    su - alice
+    sudo whoami   # should print: root
+    ```
+  </Step>
+</Steps>
+
+## Set up SSH key access for the new user
+
+```bash
+sudo mkdir -p /home/alice/.ssh
+sudo nano /home/alice/.ssh/authorized_keys
+# Paste the public key, save, and exit
+
+sudo chmod 700 /home/alice/.ssh
+sudo chmod 600 /home/alice/.ssh/authorized_keys
+sudo chown -R alice:alice /home/alice/.ssh
+```
+
+See [SSH Access](/vps/ssh-access) for how to generate a key pair.
+
+## Disable root SSH login
+
+Once your new user works over SSH, disable direct root login to reduce brute-force risk.
+
+```bash
+sudo nano /etc/ssh/sshd_config
+```
+
+Set:
+
+```text
+PermitRootLogin no
+```
+
+Then reload SSH:
+
+```bash
+sudo systemctl reload ssh
+```
+
+<Warning>
+  Do not close your current root SSH session until you have confirmed you can log in as your new sudo user in a **separate** terminal. If something is misconfigured, that first session is your escape hatch.
+</Warning>
+
+## Delete a user
+
+```bash
+# Delete user but keep their home directory
+sudo deluser alice
+
+# Delete user and their home directory
+sudo deluser --remove-home alice
+```
+
+## List all users
+
+```bash
+cut -d: -f1 /etc/passwd
+```

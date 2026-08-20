@@ -1,0 +1,159 @@
+---
+title: "The First 10 Minutes on Your New Opus Host VPS"
+sidebarTitle: "First 10 Minutes"
+description: "A checklist for the first 10 minutes on a fresh Opus Host VPS: change the root password, add an SSH key, create a sudo user, enable the firewall, and patch."
+---
+
+A brand-new VPS is exposed to the internet the moment it boots. Bots start knocking on port 22 within minutes. This checklist gets you from freshly claimed to reasonably hardened in about ten minutes.
+
+## 1. Log in for the first time
+
+Grab your credentials from the panel and SSH in. See [SSH Access](/vps/ssh-access) if you need help.
+
+```bash
+ssh root@your.vps.ip
+```
+
+## 2. Change the root password
+
+Even if the password we generated is strong, changing it to something only you know is worth the 5 seconds.
+
+```bash
+passwd
+```
+
+## 3. Update the system
+
+Install the latest security patches before doing anything else.
+
+```bash
+apt update && apt upgrade -y
+```
+
+Full details in [Package Updates](/vps/package-updates).
+
+## 4. Create a non-root user
+
+Running everything as root is dangerous. Create a regular user with `sudo` access.
+
+```bash
+adduser alice
+usermod -aG sudo alice
+```
+
+Full details in [User Management](/vps/user-management).
+
+## 5. Add your SSH key
+
+Password auth is the slow lane. SSH keys are faster and much harder to brute-force.
+
+On your **local machine**, generate a key pair if you do not already have one:
+
+```bash
+ssh-keygen -t ed25519
+```
+
+Copy the public key to the VPS:
+
+```bash
+ssh-copy-id alice@your.vps.ip
+```
+
+Or do it by hand:
+
+```bash
+mkdir -p /home/alice/.ssh
+nano /home/alice/.ssh/authorized_keys   # paste your public key
+chmod 700 /home/alice/.ssh
+chmod 600 /home/alice/.ssh/authorized_keys
+chown -R alice:alice /home/alice/.ssh
+```
+
+**Test it in a second terminal** before moving on:
+
+```bash
+ssh alice@your.vps.ip
+```
+
+## 6. Disable root SSH login
+
+Once you can log in as your regular user, close the root door.
+
+```bash
+sudo nano /etc/ssh/sshd_config
+```
+
+Set:
+
+```text
+PermitRootLogin no
+PasswordAuthentication no
+```
+
+Reload SSH:
+
+```bash
+sudo systemctl reload ssh
+```
+
+<Warning>
+  Do not close your working SSH session until you have confirmed key-based login works in a **separate** terminal. That first session is your escape hatch if something is misconfigured.
+</Warning>
+
+## 7. Enable the firewall
+
+Allow SSH first, then turn on UFW.
+
+```bash
+sudo ufw allow 22/tcp
+sudo ufw default deny incoming
+sudo ufw default allow outgoing
+sudo ufw enable
+sudo ufw status verbose
+```
+
+Full details in [Firewall](/vps/firewall).
+
+## 8. Turn on automatic security updates
+
+Set and forget:
+
+```bash
+sudo apt install unattended-upgrades -y
+sudo dpkg-reconfigure --priority=low unattended-upgrades
+```
+
+## 9. Set the correct timezone
+
+Logs and cron schedules are much easier to read when the clock matches yours.
+
+```bash
+sudo timedatectl set-timezone Europe/Berlin
+timedatectl
+```
+
+## 10. Set a hostname
+
+```bash
+sudo hostnamectl set-hostname myserver
+```
+
+## Done
+
+You now have a hardened VPS with:
+
+- A non-root user with `sudo`.
+- Key-only SSH access.
+- Root login disabled.
+- A firewall blocking everything except SSH.
+- Automatic security patching.
+
+From here, take a look at:
+
+- [Backups & Snapshots](/panel/backups) so you can roll back mistakes.
+- [systemd Services](/vps/systemd-services) to keep your apps running.
+- The [Guides](/guides/install-web-server) for deploying real workloads.
+
+<Tip>
+  Take a [backup](/panel/backups) right now, while your VPS is clean and configured the way you want it. Rolling back to "day one" is priceless when an experiment goes sideways.
+</Tip>

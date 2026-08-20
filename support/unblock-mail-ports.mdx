@@ -1,0 +1,98 @@
+---
+title: "Request Mail Ports to Be Unblocked on Your VPS"
+sidebarTitle: "Unblock Mail Ports"
+description: "Outbound mail ports (25, 465, 587) are blocked by default on Opus Host VPS. Request an unblock via a support ticket or Discord — available on the free tier."
+---
+
+Outbound mail ports are blocked by default on every Opus Host VPS. This is standard practice at basically every hosting provider: a fresh VPS with open mail ports is one of the most common sources of spam on the internet, and we prefer not to be that provider.
+
+If you have a legitimate reason to send mail from your VPS, you can request the ports be unblocked. This is available on the **free tier** — no upgrade required.
+
+## Which ports are blocked
+
+| Port | Purpose |
+| --- | --- |
+| 25 | SMTP (server-to-server mail) |
+| 465 | SMTPS (legacy submission over TLS) |
+| 587 | SMTP submission (mail clients to servers) |
+
+All three can be unblocked. Let us know which ones you actually need.
+
+## Requirements
+
+Before we unblock, we check two things:
+
+1. **A good reason.** Tell us what you are building and why you need direct outbound mail. Common accepted use cases include:
+   - Transactional email for a real app (signups, password resets, order confirmations).
+   - A mail server you are running for your own domain.
+   - A newsletter to a list of users who explicitly opted in.
+2. **No prior abuse.** Your account must have a clean history. Any previous violation of the [Acceptable Use Policy](/account/rules) — spam, phishing, or abuse reports — will get the request denied.
+
+<Warning>
+  "I want to send bulk emails to a list I bought / scraped" is **not** a good reason and the request will be rejected. Doing it anyway after we unblock the ports will get your VPS suspended.
+</Warning>
+
+## How to request an unblock
+
+You can reach us through either channel:
+
+<CardGroup cols={2}>
+  <Card title="Panel Support Ticket" icon="ticket" href="https://opus-host.de/login">
+    Open a ticket from the [control panel](https://opus-host.de/login). Best for anything account-specific.
+  </Card>
+
+  <Card title="Discord" icon="discord" href="https://discord.gg/opushost">
+    Ping us on [discord.gg/opushost](https://discord.gg/opushost). Fine for quick requests.
+  </Card>
+</CardGroup>
+
+## What to include in your request
+
+Save a round-trip by giving us everything up front:
+
+- The **VPS ID or hostname** you want unblocked.
+- **Which ports** you need (25, 465, 587, or all three).
+- **What you plan to send** — transactional email for an app, personal mail server, etc.
+- The **domain(s)** you will be sending from.
+- (Recommended) That you have **SPF, DKIM, and DMARC** set up on the sending domain, or a plan to set them up. This protects your deliverability and reduces the chance you will end up on blocklists.
+
+### Example request
+
+```text
+Hi Opus Host,
+
+I'd like to request outbound mail unblocks for VPS <id-or-hostname>.
+
+Ports needed: 25, 587
+Use case:     Transactional email (signup and password reset) for my SaaS at example.com.
+Domain:       mail.example.com
+Mail server:  Postfix
+SPF/DKIM/DMARC: SPF and DKIM configured, DMARC set to p=none for now.
+
+Thanks!
+```
+
+## What happens after
+
+<Steps>
+  <Step title="We review the request">
+    Standard support response time applies. See [Contact Support](/support/contact).
+  </Step>
+  <Step title="We unblock the ports">
+    If approved, we lift the block on the requested ports for your VPS. No reboot required.
+  </Step>
+  <Step title="You configure your mail server">
+    Set up your mail server (Postfix, exim, or an app-level library) and confirm you can send mail. Consider using a smart host / relay for better deliverability.
+  </Step>
+</Steps>
+
+## After you are unblocked
+
+- **Set up SPF, DKIM, and DMARC** on the sending domain. Without them your mail will land in spam or be rejected outright.
+- **Set proper rDNS** — open a ticket if you need help setting your VPS's PTR record.
+- **Monitor your outbound volume.** A compromised app suddenly sending thousands of emails is a fast way to end up back on the blocklist.
+- **Do not send unsolicited mail.** Abuse reports will result in the block being reinstated and, depending on severity, further action on your account.
+
+<Tip>
+  If you only need to send a low volume of transactional email, using a third-party relay (like Mailgun, Postmark, or Amazon SES) is often easier than running your own mail server — and their infrastructure is already trusted by major inbox providers.
+</Tip>

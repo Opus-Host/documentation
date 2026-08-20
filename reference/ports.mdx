@@ -1,0 +1,82 @@
+---
+title: "Common Port Reference for Opus Host VPS Users"
+sidebarTitle: "Port Reference"
+description: "A quick reference of the network ports you'll encounter on your Opus Host VPS — what they're for, which are safe to open, and which stay closed."
+---
+
+Every service on your VPS listens on a **port**. This page is a cheat sheet: what each common port is for, and whether you should open it in your [firewall](/vps/firewall).
+
+## Ports you will likely open
+
+| Port | Protocol | Service | Notes |
+| --- | --- | --- | --- |
+| 22 | TCP | SSH | Remote command line. Always allow this before enabling UFW |
+| 80 | TCP | HTTP | Web traffic. Needed for Certbot's HTTP challenge |
+| 443 | TCP | HTTPS | Encrypted web traffic |
+| 25565 | TCP | Minecraft Java | See [Game Server](/guides/setup-game-server) |
+| 51820 | UDP | WireGuard | Default WireGuard port. See [WireGuard VPN](/guides/wireguard-vpn) |
+
+## Ports blocked by default
+
+Outbound mail ports are blocked on every new Opus Host VPS to prevent spam. Request an unblock if you have a legitimate reason.
+
+| Port | Protocol | Service | Notes |
+| --- | --- | --- | --- |
+| 25 | TCP | SMTP | Server-to-server mail |
+| 465 | TCP | SMTPS | Legacy TLS submission |
+| 587 | TCP | SMTP submission | Mail clients to servers |
+
+See [Unblock Mail Ports](/support/unblock-mail-ports).
+
+## Ports you should keep closed to the public
+
+These are useful **inside** your VPS but should never be reachable from the public internet without a very good reason. Bind these services to `127.0.0.1` and put a reverse proxy in front if needed.
+
+| Port | Service | Why keep it private |
+| --- | --- | --- |
+| 3306 | MySQL / MariaDB | Databases are prime brute-force targets |
+| 5432 | PostgreSQL | Same as above |
+| 6379 | Redis | Historically shipped with no auth |
+| 27017 | MongoDB | Historically shipped with no auth |
+| 3000, 5000, 8000, 8080 | Dev servers | Almost never meant for the public |
+
+See [Databases](/guides/databases) and [Nginx Reverse Proxy](/guides/nginx-reverse-proxy).
+
+## Well-known services
+
+| Port | Service |
+| --- | --- |
+| 21 | FTP |
+| 53 | DNS |
+| 110 | POP3 |
+| 143 | IMAP |
+| 993 | IMAPS |
+| 995 | POP3S |
+| 3389 | RDP |
+
+## Check what's listening
+
+See every port your VPS is currently listening on and which process owns it:
+
+```bash
+sudo ss -tulpn
+```
+
+## Open or close a port
+
+```bash
+# Allow a port
+sudo ufw allow 80/tcp
+
+# Remove the rule
+sudo ufw delete allow 80/tcp
+
+# List current firewall rules
+sudo ufw status verbose
+```
+
+Full firewall setup in [Firewall](/vps/firewall).
+
+<Tip>
+  Every open port is one more thing to keep patched. If you are not sure whether you need a port open, leave it closed — you can always allow it later.
+</Tip>

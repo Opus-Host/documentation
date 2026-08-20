@@ -1,0 +1,154 @@
+---
+title: "Linux CLI Cheatsheet for Opus Host VPS Users"
+sidebarTitle: "Linux CLI Cheatsheet"
+description: "The Linux commands you'll actually use on your Opus Host VPS: files, permissions, processes, services, networking, and package management."
+---
+
+A short reference of the commands you will use daily on your VPS. Not exhaustive, just the ones that come up.
+
+## Files and directories
+
+```bash
+ls               # list files in current directory
+ls -lah          # long format, all files, human-readable sizes
+cd /path/to/dir  # change directory
+cd ~             # go to your home directory
+pwd              # print current directory
+mkdir foo        # make directory
+rm file          # remove file
+rm -rf dir       # remove directory and contents (careful!)
+cp src dst       # copy
+mv src dst       # move or rename
+touch file       # create empty file / update timestamp
+cat file         # print file contents
+less file        # scroll through file (q to quit)
+tail -f log      # follow a log file as it grows
+head -n 20 file  # first 20 lines
+find . -name "*.log"  # find files by name
+```
+
+## Permissions and ownership
+
+```bash
+chmod 644 file           # rw-r--r--
+chmod 755 script.sh      # rwxr-xr-x (executable)
+chmod +x script.sh       # make executable
+chown user:group file    # change owner and group
+sudo chown -R www-data:www-data /var/www
+```
+
+## Users and sudo
+
+```bash
+whoami                   # current username
+id                       # user ID and groups
+sudo command             # run one command as root
+sudo -i                  # interactive root shell
+adduser alice            # create user (see User Management)
+```
+
+See [User Management](/vps/user-management) for the full flow.
+
+## Processes
+
+```bash
+ps aux                   # all running processes
+top                      # live process view (q to quit)
+htop                     # nicer top (sudo apt install htop)
+kill <pid>               # gracefully stop a process
+kill -9 <pid>            # force kill
+pgrep -af nginx          # find PIDs by name
+```
+
+## Services (systemd)
+
+```bash
+sudo systemctl status nginx
+sudo systemctl start nginx
+sudo systemctl stop nginx
+sudo systemctl restart nginx
+sudo systemctl enable nginx     # start on boot
+sudo journalctl -u nginx -f     # follow service logs
+```
+
+See [systemd Services](/vps/systemd-services).
+
+## Disk and memory
+
+```bash
+df -h            # disk space by mount
+du -sh /var/*    # size of each directory in /var
+free -h          # RAM and swap usage
+uptime           # load average
+```
+
+## Networking
+
+```bash
+ip a             # network interfaces and IPs
+ss -tulpn        # listening ports and processes
+ping example.com
+curl -I https://example.com   # HTTP headers
+dig example.com               # DNS lookup
+```
+
+## Package management (apt)
+
+```bash
+sudo apt update              # refresh package index
+sudo apt upgrade -y          # install available upgrades
+sudo apt install nginx -y    # install a package
+sudo apt remove nginx        # remove a package
+sudo apt autoremove -y       # remove unused deps
+apt search nginx             # search for a package
+```
+
+See [Package Updates](/vps/package-updates).
+
+## Downloading files
+
+```bash
+curl -O https://example.com/file.tar.gz
+wget https://example.com/file.tar.gz
+```
+
+## Archives
+
+```bash
+tar czf out.tar.gz dir/      # create gzip archive
+tar xzf out.tar.gz           # extract gzip archive
+unzip file.zip
+```
+
+## SSH and file transfer
+
+```bash
+ssh alice@your.vps.ip
+scp local.txt alice@your.vps.ip:/home/alice/
+rsync -avz local/ alice@your.vps.ip:/home/alice/remote/
+```
+
+## Editing files
+
+```bash
+nano file    # beginner-friendly editor. See Nano Cheatsheet
+vim file     # if you already know vim
+```
+
+See [Nano Cheatsheet](/reference/nano-cheatsheet).
+
+## History and shortcuts
+
+```bash
+history         # command history
+!!              # repeat last command
+!123            # repeat command number 123 from history
+Ctrl+R          # search backwards through history
+Ctrl+C          # cancel running command
+Ctrl+D          # log out / close shell
+Ctrl+L          # clear screen
+```
+
+<Tip>
+  When in doubt, `man <command>` gives you the manual page. Press `q` to quit.
+</Tip>

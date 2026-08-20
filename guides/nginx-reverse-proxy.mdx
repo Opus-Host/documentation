@@ -1,0 +1,108 @@
+---
+title: "Reverse Proxy Multiple Apps With Nginx on One VPS"
+sidebarTitle: "Nginx Reverse Proxy"
+description: "Use Nginx as a reverse proxy on your Opus Host VPS to serve multiple apps on different domains from a single VPS, all on ports 80 and 443."
+---
+
+Only one process can listen on port 80 at a time. A reverse proxy solves that: Nginx sits on ports 80 and 443, and forwards each request to the right backend app based on the domain. Run a Node.js app, a Python API, and a static site side by side on one Opus Host VPS.
+
+## Install Nginx
+
+```bash
+sudo apt update
+sudo apt install -y nginx
+```
+
+See [Web Server](/guides/install-web-server) if you want a fuller intro.
+
+## Example: proxy a Node.js app on port 3000
+
+Suppose your app runs on `localhost:3000` (see [Node.js & PM2](/guides/nodejs-pm2)). Create `/etc/nginx/sites-available/app.example.com`:
+
+```nginx
+server {
+    listen 80;
+    server_name app.example.com;
+
+    location / {
+        proxy_pass http://127.0.0.1:3000;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+
+        # WebSocket support
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+    }
+}
+```
+
+Enable and reload:
+
+```bash
+sudo ln -s /etc/nginx/sites-available/app.example.com /etc/nginx/sites-enabled/
+sudo nginx -t
+sudo systemctl reload nginx
+```
+
+## Add a second app on another subdomain
+
+Repeat the pattern with a new file and a different `server_name` and `proxy_pass` port:
+
+```nginx
+server {
+    listen 80;
+    server_name api.example.com;
+
+    location / {
+        proxy_pass http://127.0.0.1:8000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+    }
+}
+```
+
+Each app listens on its own local port. Nginx handles the public entry point.
+
+## Serve static files alongside proxied apps
+
+```nginx
+server {
+    listen 80;
+    server_name example.com;
+    root /var/www/example.com;
+    index index.html;
+
+    location / {
+        try_files $uri $uri/ =404;
+    }
+
+    location /api/ {
+        proxy_pass http://127.0.0.1:8000/;
+        proxy_set_header Host $host;
+    }
+}
+```
+
+## Add HTTPS
+
+Run Certbot to add HTTPS to each domain. See [Let's Encrypt SSL](/guides/lets-encrypt-ssl).
+
+```bash
+sudo certbot --nginx -d app.example.com -d api.example.com
+```
+
+<Tip>
+  Bind your backend apps to `127.0.0.1` instead of `0.0.0.0` so they are not reachable from outside. Nginx is the only public entry point.
+</Tip>
+
+## Test and reload safely
+
+Always test the config before reloading. Nginx will refuse to reload a broken config, but catching mistakes early saves headaches:
+
+```bash
+sudo nginx -t
+sudo systemctl reload nginx
+```

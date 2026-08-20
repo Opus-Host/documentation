@@ -1,0 +1,150 @@
+---
+title: "Connect to Your Opus Host VPS Using SSH (All Platforms)"
+sidebarTitle: "SSH Access"
+description: "Learn how to connect to your Opus Host VPS over SSH from Windows, Mac, or Linux — and how to set up SSH key authentication for better security."
+---
+
+SSH (Secure Shell) lets you connect to your VPS from your computer's terminal and run commands remotely. It's the most common way to manage a Linux server — giving you full control over your VPS through a fast, encrypted connection. All Opus Host VPS instances have SSH enabled by default on port 22.
+
+## Find your SSH credentials
+
+Before connecting, you'll need three pieces of information from your Opus Host dashboard:
+
+- **IP address** — shown on the main VPS overview page.
+- **Username** — `root` by default on all fresh installs.
+- **Password** — displayed on the dashboard after provisioning or reinstall. If you've lost it, you can reset it from the **Settings** page.
+
+Navigate to your VPS in the [Opus Host control panel](https://opus-host.de/login) and keep this tab open while you follow the steps below.
+
+## Connecting from Mac / Linux
+
+Mac and Linux both include a built-in SSH client, so no extra software is needed.
+
+<Steps>
+  <Step title="Open Terminal">
+    Open the **Terminal** application. On Mac, you can find it in _Applications → Utilities → Terminal_ or search for it with Spotlight (`⌘ Space`).
+  </Step>
+  <Step title="Run the SSH command">
+    Type the following command, replacing `YOUR_SERVER_IP` with your actual VPS IP address, then press **Enter**:
+
+    ```bash
+    ssh root@YOUR_SERVER_IP
+    ```
+  </Step>
+  <Step title="Accept the host fingerprint">
+    The first time you connect, you'll see a message like:
+
+    ```text
+    The authenticity of host '203.0.113.42' can't be established.
+    Are you sure you want to continue connecting (yes/no/[fingerprint])?
+    ```
+
+    Type `yes` and press **Enter**. This stores the server's fingerprint so you won't be prompted again on future connections.
+  </Step>
+  <Step title="Enter your password">
+    When prompted, type your root password (from your Opus Host dashboard) and press **Enter**. Note that the cursor won't move as you type — this is normal behavior for password fields in a terminal.
+  </Step>
+</Steps>
+
+## Connecting from Windows
+
+<Tabs>
+  <Tab title="Windows Terminal">
+    Windows 10 and Windows 11 include a built-in OpenSSH client, so you can connect directly from **Windows Terminal**, **PowerShell**, or **Command Prompt** — no extra software required.
+
+    Open Windows Terminal (search for it in the Start menu) and run:
+
+    ```bash
+    ssh root@YOUR_SERVER_IP
+    ```
+
+    Accept the host fingerprint prompt by typing `yes`, then enter your password when asked. The steps are identical to the Mac / Linux instructions above.
+  </Tab>
+  <Tab title="PuTTY">
+    PuTTY is a free, popular SSH client for Windows that provides a graphical interface for managing connections.
+
+    <Steps>
+      <Step title="Download PuTTY">
+        Download the PuTTY installer from the official site at [putty.org](https://www.putty.org) and run it to install.
+      </Step>
+      <Step title="Enter your server's IP address">
+        In the **Host Name (or IP address)** field, type your VPS IP address.
+      </Step>
+      <Step title="Confirm port and connection type">
+        Ensure **Port** is set to `22` and the connection type is set to **SSH**.
+      </Step>
+      <Step title="Click Open">
+        Click the **Open** button. If prompted with a security alert about the server's host key, click **Accept** to trust it and continue.
+      </Step>
+      <Step title="Log in as root">
+        When the terminal window opens, type `root` at the `login as:` prompt and press **Enter**.
+      </Step>
+      <Step title="Enter your password">
+        Type your root password (from your FreeHost dashboard) and press **Enter** to complete the login.
+      </Step>
+    </Steps>
+  </Tab>
+</Tabs>
+
+## Setting up SSH key authentication (recommended)
+
+SSH keys are a more secure alternative to password-based login. Instead of typing a password, your local machine and your VPS exchange cryptographic keys to verify your identity. Once set up, connecting is faster and significantly more secure.
+
+<Steps>
+  <Step title="Generate a key pair on your local machine">
+    Run the following command in your local terminal, replacing the email with your own:
+
+    ```bash
+    ssh-keygen -t ed25519 -C "your@email.com"
+    ```
+
+    You'll be asked where to save the key (press **Enter** to accept the default location) and optionally set a passphrase for extra protection. This creates two files: a private key (`~/.ssh/id_ed25519`) that stays on your machine, and a public key (`~/.ssh/id_ed25519.pub`) that goes to your server.
+  </Step>
+  <Step title="Copy your public key to your VPS">
+    Use `ssh-copy-id` to install your public key on the server automatically:
+
+    ```bash
+    ssh-copy-id root@YOUR_SERVER_IP
+    ```
+
+    You'll be asked for your root password one last time. After this, your public key will be added to `~/.ssh/authorized_keys` on your VPS.
+  </Step>
+  <Step title="Test key-based login">
+    Verify that key authentication is working by connecting again:
+
+    ```bash
+    ssh root@YOUR_SERVER_IP
+    ```
+
+    If everything is set up correctly, you'll be logged in without being prompted for a password.
+  </Step>
+  <Step title="Disable password authentication (optional but recommended)">
+    Once you've confirmed your SSH key works, you can disable password-based login to prevent brute-force attacks.
+
+    Open the SSH daemon configuration file on your VPS:
+
+    ```bash
+    nano /etc/ssh/sshd_config
+    ```
+
+    Find the line `PasswordAuthentication yes` and change it to:
+
+    ```bash
+    PasswordAuthentication no
+    ```
+
+    Save the file, then restart the SSH service for the change to take effect:
+
+    ```bash
+    systemctl restart sshd
+    ```
+  </Step>
+</Steps>
+
+<Tip>
+  Using SSH keys is much more secure than passwords — they're immune to brute-force guessing attacks. Once set up, you won't need to type a password to connect, making your workflow faster too.
+</Tip>
+
+<Warning>
+  If you disable password authentication, **make absolutely sure your SSH key login is working first** before closing your current session. If your key isn't set up correctly and you disable passwords, you will lock yourself out. Use the **in-browser console** in the Opus Host control panel as an emergency fallback to regain access.
+</Warning>

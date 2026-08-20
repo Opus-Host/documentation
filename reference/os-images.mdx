@@ -1,0 +1,46 @@
+---
+title: "Choosing an OS Image for Your Opus Host VPS"
+sidebarTitle: "OS Images"
+description: "A quick comparison of the operating system images available on Opus Host VPS — Ubuntu, Debian, and others — with recommendations by use case."
+---
+
+When you claim or [reinstall](/vps/reinstall-os) your VPS, you get to pick an OS image. Here is a short guide to help you choose.
+
+## Quick recommendation
+
+- **Just want it to work?** Pick **Ubuntu 24.04 LTS**.
+- **Want something lightweight and stable?** Pick **Debian 12**.
+- **Need something specific?** Read on.
+
+## Ubuntu
+
+The most popular Linux distribution for servers. Almost every tutorial on the internet assumes Ubuntu, and almost every piece of software has a `.deb` package or install script for it.
+
+- **Best for:** Beginners, general-purpose servers, following third-party tutorials.
+- **Versions to prefer:** LTS (Long-Term Support) releases, currently **24.04**.
+- **Package manager:** `apt`.
+
+## Debian
+
+Ubuntu's upstream. Slightly older packages, but rock-solid stability and a smaller default install.
+
+- **Best for:** Servers you want to leave alone for a long time, minimal setups, users who want fewer preinstalled things.
+- **Versions to prefer:** **Debian 12 (Bookworm)**.
+- **Package manager:** `apt`.
+
+## Which should you pick?
+
+| If you... | Pick |
+| --- | --- |
+| Are following a random tutorial online | Ubuntu (whatever version it says) |
+| Want the latest packages | Ubuntu 24.04 |
+| Want maximum stability and minimal cruft | Debian 12 |
+| Have no strong opinion | Ubuntu 24.04 LTS |
+
+## Switching later
+
+You can change your OS at any time by doing a [reinstall](/vps/reinstall-os). Just remember: reinstalling **wipes the disk**, so back up anything you care about first (see [Backups & Snapshots](/panel/backups)).
+
+<Tip>
+  When in doubt, go with Ubuntu 24.04 LTS. Every guide in this documentation is written against Ubuntu/Debian and everything just works.
+</Tip>

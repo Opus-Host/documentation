@@ -1,0 +1,88 @@
+---
+title: "Delete Your Opus Host Account and All Your Data"
+sidebarTitle: "Data Deletion"
+description: "Request full deletion of your Opus Host account and VPS data via a panel support ticket or Discord. Nothing is retained after deletion."
+---
+
+You can request full deletion of your Opus Host account and everything associated with it at any time. When we process the request, **everything gets deleted** — no retention window, no shadow copies, no backups sitting on a shelf.
+
+## What gets deleted
+
+- Your account and login credentials.
+- Every VPS on the account, including disk contents.
+- Any [backups or snapshots](/panel/backups) you had.
+- Support ticket history tied to the account.
+
+<Warning>
+  Deletion is **permanent and immediate**. Once we process the request, there is no way for us (or anyone) to recover your data. Take copies of anything you want to keep before you ask.
+</Warning>
+
+## Before you request deletion
+
+<Steps>
+  <Step title="Back up anything you want to keep">
+    Copy files off your VPS with `scp`, `rsync`, or the [File Manager](/panel/file-manager). Export databases with `mysqldump` or `pg_dump`. Once we delete the account, none of this is recoverable.
+  </Step>
+  <Step title="Move DNS off your VPS IP">
+    If you have a domain pointing at your VPS ([Custom Domain](/guides/custom-domain)), update your DNS to point somewhere else before deletion so visitors do not hit a dead IP.
+  </Step>
+  <Step title="Cancel anything hooked into your VPS">
+    Webhooks, cron jobs on other services, bots — anything that expects your VPS to be there should be turned off or repointed.
+  </Step>
+</Steps>
+
+## How to request deletion
+
+Use either channel below. Both reach the same team.
+
+<CardGroup cols={2}>
+  <Card title="Panel Support Ticket" icon="ticket" href="https://opus-host.de/login">
+    Open a ticket from the [control panel](https://opus-host.de/login). Recommended, because it confirms you own the account.
+  </Card>
+
+  <Card title="Discord" icon="discord" href="https://discord.gg/opushost">
+    DM us on [discord.gg/opushost](https://discord.gg/opushost). We may still ask you to confirm from the panel to verify ownership.
+  </Card>
+</CardGroup>
+
+## What to include in your request
+
+- The **email address** on your Opus Host account.
+- Confirmation that you understand deletion is **permanent and cannot be undone**.
+- (Optional) A quick reason, if you feel like sharing. It helps us improve.
+
+### Example request
+
+```text
+Hi Opus Host,
+
+I'd like to permanently delete my account and all associated data.
+
+Account email: me@example.com
+
+I understand this cannot be undone.
+
+Thanks!
+```
+
+## What happens after
+
+<Steps>
+  <Step title="We verify ownership">
+    We confirm the request is coming from the account holder. Requests from the panel are self-verifying; Discord requests may need an extra confirmation.
+  </Step>
+  <Step title="We delete everything">
+    Your account, VPS instances, disks, backups, and ticket history are removed.
+  </Step>
+  <Step title="We confirm">
+    You get a final confirmation that the deletion is complete.
+  </Step>
+</Steps>
+
+## Just want to delete one VPS?
+
+If you only want to get rid of a single VPS but keep your account, you do not need to open a deletion ticket. You can drop the VPS from your dashboard or simply not renew it — see [Renewal](/account/renew) for what happens when a VPS expires.
+
+<Tip>
+  Not sure yet? A full [reinstall](/vps/reinstall-os) wipes the disk clean without deleting the account, which is often what people actually want when they say "delete everything".
+</Tip>

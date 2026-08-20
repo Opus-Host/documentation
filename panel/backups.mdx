@@ -1,0 +1,80 @@
+---
+title: "Back Up and Snapshot Your Opus Host VPS"
+sidebarTitle: "Backups & Snapshots"
+description: "Create manual backups and snapshots of your Opus Host VPS from the control panel. Free tier users can request backup slots from support."
+---
+
+A backup is your safety net. Before a risky config change, an OS upgrade, or a [reinstall](/vps/reinstall-os), take a snapshot so you can roll back in one click if anything goes wrong.
+
+## Requesting a backup slot (free tier)
+
+Backup slots are not enabled by default on free VPS plans. You can request one from our support team.
+
+<Steps>
+  <Step title="Open a ticket">
+    Open a support ticket from the [control panel](https://opus-host.de/login) or see [Contact Support](/support/contact).
+  </Step>
+  <Step title="Tell us which VPS you want the slot on">
+    Include the VPS ID or hostname, and (optionally) why you need it — not a requirement, just helps us prioritize.
+  </Step>
+  <Step title="Wait for confirmation">
+    Once we enable the slot, the **Backups** tab becomes available on your VPS page in the panel.
+  </Step>
+</Steps>
+
+## Create a backup
+
+Backups are triggered manually. There is no automatic schedule.
+
+<Steps>
+  <Step title="Open the Backups tab">
+    In the [control panel](https://opus-host.de/login), open your VPS and switch to the **Backups** tab.
+  </Step>
+  <Step title="Click Create Backup">
+    Give the backup a descriptive name (for example, `pre-nginx-upgrade`) so you can find it later.
+  </Step>
+  <Step title="Wait for it to finish">
+    Large disks take longer. The VPS keeps running during the backup, but performance may dip while the snapshot is being written.
+  </Step>
+</Steps>
+
+## Restore a backup
+
+<Warning>
+  Restoring **overwrites** your current disk. Any changes made after the backup was created will be lost. Take a fresh backup first if you want to preserve the current state.
+</Warning>
+
+<Steps>
+  <Step title="Open the Backups tab">
+    Find the backup you want to restore.
+  </Step>
+  <Step title="Click Restore">
+    Confirm the prompt. The VPS will be stopped, the backup written back to disk, and the VPS started again.
+  </Step>
+  <Step title="Verify">
+    SSH in or use the [in-browser console](/panel/console) to confirm your services came back up.
+  </Step>
+</Steps>
+
+## Retention
+
+Backups are kept **until you delete them**. There is no automatic expiry. Delete old backups you no longer need so the slot stays available for new ones.
+
+## Delete a backup
+
+Open the **Backups** tab, find the backup, and click **Delete**. This action cannot be undone.
+
+## When to take a backup
+
+- Before running [`apt full-upgrade`](/vps/package-updates) or a major OS update.
+- Before editing critical config files (SSH, firewall, Nginx).
+- Before installing anything with a big footprint (Docker, control panels, game server managers).
+- Right after finishing a fresh setup you do not want to redo.
+
+<Tip>
+  A panel backup captures your whole disk, which is great for rolling back, but it is stored on our infrastructure. For irreplaceable data (databases, uploads), also keep an **off-server** copy using `rsync`, `restic`, or `rclone` to a bucket you control.
+</Tip>
+
+## Backups vs. reinstall
+
+A [reinstall](/vps/reinstall-os) wipes the disk and gives you a clean OS image. A backup captures your current disk so you can return to it. Use reinstall to start over; use backups to move backward in time.

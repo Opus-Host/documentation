@@ -1,0 +1,61 @@
+---
+title: "Get a Free HTTPS Certificate With Let's Encrypt"
+sidebarTitle: "Let's Encrypt SSL"
+description: "Secure your website with free HTTPS using Let's Encrypt and Certbot on your Opus Host VPS — including automatic renewal."
+---
+
+HTTPS is table stakes. Let's Encrypt issues free certificates, and Certbot automates the whole flow: request the cert, install it in Nginx, and renew it automatically before it expires.
+
+## Prerequisites
+
+- A domain name pointing to your VPS. See [Custom Domain](/guides/custom-domain).
+- Nginx installed and serving your site. See [Web Server](/guides/install-web-server).
+- Ports 80 and 443 open in your firewall. See [Firewall](/vps/firewall).
+
+## Install Certbot
+
+```bash
+sudo apt update
+sudo apt install -y certbot python3-certbot-nginx
+```
+
+## Issue a certificate
+
+Certbot can edit your Nginx config automatically and set up HTTPS in one step.
+
+```bash
+sudo certbot --nginx -d example.com -d www.example.com
+```
+
+You will be asked for an email (for renewal reminders) and whether to redirect all HTTP traffic to HTTPS. **Yes** is the right answer for most sites.
+
+## Test automatic renewal
+
+Certbot installs a systemd timer that renews certificates before they expire. Verify it works with a dry run:
+
+```bash
+sudo certbot renew --dry-run
+```
+
+If that succeeds, you never need to touch renewal again.
+
+## Check certificate status
+
+```bash
+sudo certbot certificates
+```
+
+## Revoke or delete a certificate
+
+```bash
+sudo certbot revoke --cert-name example.com
+sudo certbot delete --cert-name example.com
+```
+
+<Tip>
+  If Certbot fails with a challenge error, the most common cause is DNS not yet pointing to your VPS or port 80 being blocked. Confirm both before retrying.
+</Tip>
+
+<Warning>
+  Let's Encrypt has rate limits (currently 5 duplicate certificates per week per domain). Use `--dry-run` when testing to avoid hitting the limit.
+</Warning>

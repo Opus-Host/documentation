@@ -1,0 +1,97 @@
+---
+title: "Opus Host Glossary: Terms Every VPS User Should Know"
+sidebarTitle: "Glossary"
+description: "Plain-English definitions of the terms you'll see across the Opus Host docs — VPS, SSH, DNS, sudo, systemd, and more."
+---
+
+Quick, no-jargon definitions of the terms used throughout the Opus Host docs.
+
+## A
+
+**AUP (Acceptable Use Policy).** The rules for what you can and cannot do on your VPS. See [Acceptable Use](/account/rules).
+
+**apt.** The package manager on Debian and Ubuntu. Used to install and update software (`apt install nginx`).
+
+## B
+
+**Backup.** A copy of your VPS disk you can restore later. See [Backups & Snapshots](/panel/backups).
+
+**Bandwidth.** The amount of network traffic your VPS can transfer in a given period.
+
+## C
+
+**cron.** The classic Unix job scheduler. See [Cron Jobs](/vps/cron-jobs).
+
+**CLI (Command-Line Interface).** The text-based way of controlling your VPS. What you use over SSH.
+
+## D
+
+**Daemon.** A background process. Most services on a VPS run as daemons managed by systemd.
+
+**DNS (Domain Name System).** The system that turns `example.com` into an IP address. See [Custom Domain](/guides/custom-domain).
+
+**Docker.** A tool for running apps in isolated containers. See [Docker](/guides/docker).
+
+## F
+
+**Firewall.** A filter that decides which network traffic is allowed in and out. On Opus Host VPS this is usually UFW. See [Firewall](/vps/firewall).
+
+## H
+
+**Hostname.** The name of your VPS on the network (e.g. `myserver`).
+
+**HTTPS.** HTTP with encryption. Enabled by installing a TLS certificate, usually from [Let's Encrypt](/guides/lets-encrypt-ssl).
+
+## I
+
+**IP address.** The numeric address of your VPS on the internet.
+
+## N
+
+**Nginx.** A popular web server and reverse proxy. See [Web Server](/guides/install-web-server) and [Nginx Reverse Proxy](/guides/nginx-reverse-proxy).
+
+## P
+
+**Package.** A piece of software installable through `apt`.
+
+**Port.** A number that identifies a specific service on your VPS. Web servers use 80/443, SSH uses 22. See [Port Reference](/reference/ports).
+
+**PM2.** A process manager for Node.js apps. See [Node.js & PM2](/guides/nodejs-pm2).
+
+## R
+
+**Reboot.** Restart the VPS. See [Power Controls](/vps/start-stop-restart).
+
+**Reverse proxy.** A server (usually Nginx) that sits in front of your apps and forwards requests to them.
+
+**root.** The all-powerful admin user on Linux. Avoid using it directly; create a sudo user instead. See [User Management](/vps/user-management).
+
+## S
+
+**SSH (Secure Shell).** The standard way to get a remote command line on your VPS. See [SSH Access](/vps/ssh-access).
+
+**SSH key.** A cryptographic key pair used to log in over SSH without a password. Safer and faster.
+
+**sudo.** "Superuser do". Runs a single command as root without switching users.
+
+**Swap.** Disk space Linux uses as overflow memory when RAM is full. See [Swap & Performance](/vps/swap-and-performance).
+
+**systemd.** The service manager on modern Linux. Starts, stops, and supervises daemons. See [systemd Services](/vps/systemd-services).
+
+## T
+
+**TLS/SSL.** The encryption behind HTTPS. Certificates from Let's Encrypt are free.
+
+## U
+
+**UFW (Uncomplicated Firewall).** A user-friendly frontend for the Linux firewall. See [Firewall](/vps/firewall).
+
+**Uptime.** How long your VPS has been running since the last reboot (`uptime` command).
+
+## V
+
+**VPS (Virtual Private Server).** A virtual computer running on shared hardware, but with its own OS, files, and IP address. What Opus Host gives you.
+
+## W
+
+**Web server.** Software that serves websites over HTTP/HTTPS. Nginx and Apache are the most common.

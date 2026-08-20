@@ -1,0 +1,137 @@
+---
+title: "Host a Telegram Bot 24/7 on Your Free VPS"
+sidebarTitle: "Telegram Bot"
+description: "Deploy a Telegram bot on your Opus Host VPS with Python or Node.js and keep it running around the clock using systemd or PM2."
+---
+
+Telegram bots need a machine that is always online. Your Opus Host VPS is exactly that. This guide covers deploying a bot in Python or Node.js and keeping it alive after crashes and reboots.
+
+## 1. Create a bot and get a token
+
+1. Open Telegram and message [@BotFather](https://t.me/BotFather).
+2. Send `/newbot` and follow the prompts.
+3. Save the token BotFather gives you. You will need it below.
+
+## 2. Install your language
+
+<Tabs>
+  <Tab title="Python">
+    ```bash
+    sudo apt update
+    sudo apt install -y python3 python3-pip python3-venv git
+    ```
+  </Tab>
+  <Tab title="Node.js">
+    ```bash
+    curl -fsSL https://deb.nodesource.com/setup_20.x | sudo bash -
+    sudo apt install -y nodejs git
+    ```
+  </Tab>
+</Tabs>
+
+## 3. Get your bot code onto the VPS
+
+Clone from Git or upload via the [File Manager](/panel/file-manager):
+
+```bash
+git clone https://github.com/yourusername/mybot.git ~/mybot
+cd ~/mybot
+```
+
+## 4. A minimal example bot
+
+<Tabs>
+  <Tab title="Python">
+    ```bash
+    python3 -m venv venv
+    source venv/bin/activate
+    pip install python-telegram-bot
+    ```
+
+    Create `bot.py`:
+
+    ```python
+    import os
+    from telegram.ext import ApplicationBuilder, CommandHandler
+    
+    async def start(update, context):
+        await update.message.reply_text("Hello from Opus Host!")
+    
+    app = ApplicationBuilder().token(os.environ["BOT_TOKEN"]).build()
+    app.add_handler(CommandHandler("start", start))
+    app.run_polling()
+    ```
+
+    Test it:
+
+    ```bash
+    BOT_TOKEN=your-token python3 bot.py
+    ```
+  </Tab>
+  <Tab title="Node.js">
+    ```bash
+    npm init -y
+    npm install node-telegram-bot-api
+    ```
+
+    Create `index.js`:
+
+    ```javascript
+    const TelegramBot = require("node-telegram-bot-api");
+    const bot = new TelegramBot(process.env.BOT_TOKEN, { polling: true });
+    
+    bot.onText(/\/start/, (msg) => {
+      bot.sendMessage(msg.chat.id, "Hello from Opus Host!");
+    });
+    ```
+
+    Test it:
+
+    ```bash
+    BOT_TOKEN=your-token node index.js
+    ```
+  </Tab>
+</Tabs>
+
+Message your bot on Telegram and send `/start`. If it responds, you are ready to run it as a service.
+
+## 5. Keep it running with systemd
+
+Create `/etc/systemd/system/mybot.service`:
+
+```ini
+[Unit]
+Description=My Telegram Bot
+After=network.target
+
+[Service]
+User=root
+WorkingDirectory=/root/mybot
+Environment=BOT_TOKEN=your-telegram-token
+ExecStart=/root/mybot/venv/bin/python3 /root/mybot/bot.py
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
+```
+
+For Node.js, use `ExecStart=/usr/bin/node /root/mybot/index.js`.
+
+Enable and start:
+
+```bash
+sudo systemctl daemon-reload
+sudo systemctl enable --now mybot
+sudo systemctl status mybot
+```
+
+See [systemd Services](/vps/systemd-services) for the full reference.
+
+<Tip>
+  Store the token in a `.env` file loaded by `python-dotenv` or the `dotenv` npm package instead of pasting it into the service file. Easier to rotate, easier to keep out of Git.
+</Tip>
+
+<Warning>
+  Never commit your bot token to a public repository. If it leaks, revoke it immediately from BotFather with `/revoke` and generate a new one.
+</Warning>
